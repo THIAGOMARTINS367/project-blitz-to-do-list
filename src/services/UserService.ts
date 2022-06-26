@@ -61,7 +61,7 @@ class UserService implements IUserService {
       return { error: { code: 409, message: 'User email already exists !' } };
     }
     const newUser = await this.model.addNewUser(user) as Omit<IUserToken, 'password'>;
-    const token: string = generateJwtToken('7d', newUser, 'super-password-123');
+    const token: string = generateJwtToken('7d', newUser);
     newUser.token = token;
     return newUser;
   }
@@ -73,7 +73,7 @@ class UserService implements IUserService {
     return this.adminFormatted;
   }
 
-  async userLogin(body: IUserLogin): Promise<string | IResponseError> {
+  async userLogin(body: IUserLogin): Promise<{ token: string } | IResponseError> {
     const validation: ValidationError | undefined = this.validateUserLoginFields(body);
     if (validation) {
       const validationType = validation.details[0].type;
@@ -85,9 +85,10 @@ class UserService implements IUserService {
     const userExist = await this.model.getUserByEmailAndPassword(body);
     if (userExist.length === 1) {
       userExist[0].admin = this.formatUserLoginAttribute(userExist[0]);
-      return 'Usuário existe !';
+      const token: string = generateJwtToken('7d', userExist[0]);
+      return { token };
     }
-    return 'Email ou Senha estão incorretos !';
+    return { error: { code: 422, message: 'Incorrect email or password !' } };
   }
 }
 
