@@ -5,6 +5,8 @@ import IUserData from '../interfaces/IUserData';
 import IUserLogin from '../interfaces/IUserLogin';
 import IUserModel from '../interfaces/IUserModel';
 import IUserService from '../interfaces/IUserService';
+import IUserToken from '../interfaces/IUserToken';
+import generateJwtToken from '../utils/generateJwtToken';
 
 class UserService implements IUserService {
   constructor(
@@ -58,7 +60,9 @@ class UserService implements IUserService {
     if (userExist.length === 1) {
       return { error: { code: 409, message: 'User email already exists !' } };
     }
-    const newUser = await this.model.addNewUser(user);
+    const newUser = await this.model.addNewUser(user) as Omit<IUserToken, 'password'>;
+    const token: string = generateJwtToken('7d', newUser, 'super-password-123');
+    newUser.token = token;
     return newUser;
   }
 
