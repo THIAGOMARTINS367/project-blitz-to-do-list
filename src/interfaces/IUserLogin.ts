@@ -1,5 +1,6 @@
-import IUSer from './IUser';
-
-interface IUserLogin extends Omit<IUSer, 'admin' | 'firstName' | 'lastName'> {}
+interface IUserLogin {
+  email: string,
+  password: string,
+}
 
 export default IUserLogin;
