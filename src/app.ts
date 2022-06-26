@@ -2,6 +2,7 @@ import express from 'express';
 import UserController from './controllers/UserController';
 import UserModel from './models/UserModel';
 import UserService from './services/UserService';
+import errorMiddleware from './middlewares/error';
 
 const app = express();
 
@@ -18,5 +19,7 @@ app.post('/login', (req, res, next) => {
     new UserService(new UserModel()),
   );
 });
+
+app.use(errorMiddleware);
 
 export default app;
