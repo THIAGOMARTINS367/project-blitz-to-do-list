@@ -13,4 +13,10 @@ app.post('/sign-up', (req, res, next) => {
   );
 });
 
+app.post('/login', (req, res, next) => {
+  new UserController(req, res, next).userLogin(
+    new UserService(new UserModel()),
+  );
+});
+
 export default app;
