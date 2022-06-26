@@ -53,6 +53,20 @@ class UserModel implements IUserModel {
     );
     return userData as Omit<IUserData[], 'password'>;
   }
+
+  async getUserByEmail({
+    email,
+  }: IUserLogin): Promise<Omit<IUserData[], 'password'>> {
+    const [userData] = await this.connectionDb.execute(`
+    SELECT
+      user_id, admin, first_name, last_name, email
+    FROM
+      blitz_toDoList.user
+    WHERE email = ?`,
+      [email]
+    );
+    return userData as Omit<IUserData[], 'password'>;
+  }
 }
 
 export default UserModel;
