@@ -1,23 +1,26 @@
 import Joi, { ValidationError } from 'joi';
 import IResponseError from '../interfaces/IResponseError';
-import IUSer from '../interfaces/IUser';
+import IUser from '../interfaces/IUser';
 import IUserData from '../interfaces/IUserData';
 import IUserLogin from '../interfaces/IUserLogin';
 import IUserModel from '../interfaces/IUserModel';
 import IUserService from '../interfaces/IUserService';
 
-const { object, string, boolean } = Joi.types();
-
 class UserService implements IUserService {
-  constructor(private model: IUserModel) {}
+  constructor(
+    private model: IUserModel,
+    private joiTypes = Joi.types(),
+    private adminFormatted: boolean = false,
+  ) {}
 
-  validateAddNewUserFields({
+  private validateAddNewUserFields({
     admin,
     firstName,
     lastName,
     email,
     password,
-  }: IUSer): ValidationError | undefined {
+  }: IUser): ValidationError | undefined {
+    const { object, string, boolean } = this.joiTypes;
     const { error } = object.keys({
       admin: boolean.not().empty().required(),
       firstName: string.not().empty().required(),
@@ -28,7 +31,11 @@ class UserService implements IUserService {
     return error;
   }
 
-  validateUserLoginFields({ email, password }: IUserLogin): ValidationError | undefined {
+  private validateUserLoginFields({
+    email,
+    password,
+  }: IUserLogin): ValidationError | undefined {
+    const { object, string } = this.joiTypes;
     const { error } = object.keys({
       email: string.email().not().empty().required(),
       password: string.not().empty().required(),
@@ -36,7 +43,9 @@ class UserService implements IUserService {
     return error;
   }
 
-  async addNewUser(user: IUSer): Promise<Omit<IUserData, 'password'> | IResponseError> {
+  async addNewUser(
+    user: IUser,
+  ): Promise<Omit<IUserData, 'password'> | IResponseError> {
     const validation: ValidationError | undefined = this.validateAddNewUserFields(user);
     if (validation) {
       const validationType = validation.details[0].type;
@@ -53,6 +62,13 @@ class UserService implements IUserService {
     return newUser;
   }
 
+  formatUserLoginAttribute({ admin }: IUser): boolean {
+    if (admin === 1) {
+      this.adminFormatted = true;
+    }
+    return this.adminFormatted;
+  }
+
   async userLogin(body: IUserLogin): Promise<string | IResponseError> {
     const validation: ValidationError | undefined = this.validateUserLoginFields(body);
     if (validation) {
@@ -64,16 +80,11 @@ class UserService implements IUserService {
     }
     const userExist = await this.model.getUserByEmailAndPassword(body);
     if (userExist.length === 1) {
-      if (userExist[0].admin === 1) {
-        userExist[0].admin = true;
-      } else {
-        userExist[0].admin = false;
-      }
+      userExist[0].admin = this.formatUserLoginAttribute(userExist[0]);
       return 'Usuário existe !';
     }
     return 'Email ou Senha estão incorretos !';
   }
 }
-
 
 export default UserService;
