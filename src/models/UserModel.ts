@@ -48,7 +48,7 @@ class UserModel implements IUserModel {
     email,
     password,
   }: IUserLogin): Promise<Omit<IUserData[], 'password'>> {
-    const [rows] = await this.connectionDb.execute(`
+    const [userData] = await this.connectionDb.execute(`
     SELECT
       user_id, admin, first_name, last_name, email
     FROM
@@ -56,13 +56,7 @@ class UserModel implements IUserModel {
     WHERE email = ? AND password = ?`,
       [email, password]
     );
-    const userData = rows as Omit<IUserData[], 'password'>
-    if (userData[0].admin === 1) {
-      userData[0].admin = true;
-    } else {
-      userData[0].admin = false;
-    }
-    return userData;
+    return userData as Omit<IUserData[], 'password'>;
   }
 }
 
