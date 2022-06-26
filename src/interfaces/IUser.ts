@@ -1,5 +1,5 @@
 interface IUSer {
-  admin: boolean,
+  admin: number | boolean,
   firstName: string,
   lastName: string,
   email: string,
