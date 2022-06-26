@@ -13,6 +13,9 @@ class UserController {
   async addNewUser(service: IUserService) {
     const body: IUSer = this.req.body;
     const result = await service.addNewUser(body);
+    if (Object.keys(result).includes('error')) {
+      return this.next(result);
+    }
     this.res.status(201).json(result);
   }
 
