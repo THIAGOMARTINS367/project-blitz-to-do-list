@@ -5,7 +5,7 @@ import IUserLogin from './IUserLogin';
 
 interface IUserService {
   addNewUser(user: IUSer): Promise<Omit<IUserData, 'password'> | IResponseError>,
-  userLogin({ email, password }: IUserLogin): Promise<string>,
+  userLogin({ email, password }: IUserLogin): Promise<string | IResponseError>,
 }
 
 export default IUserService;
