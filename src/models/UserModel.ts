@@ -30,11 +30,6 @@ class UserModel implements IUserModel {
       [admin, firstName, lastName, email, password]
     );
     const { insertId } = rows as ResultSetHeader;
-    if (admin === 1) {
-      admin = true;
-    } else {
-      admin = false;
-    }
     return {
       userId: insertId,
       admin,
