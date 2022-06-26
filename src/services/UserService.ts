@@ -55,7 +55,7 @@ class UserService implements IUserService {
       return { error: { code: 400, message: validation.message } };
     }
     const userExist = await this.model.getUserByEmail(user);
-    if (userExist) {
+    if (userExist.length === 1) {
       return { error: { code: 409, message: 'User email already exists !' } };
     }
     const newUser = await this.model.addNewUser(user);
