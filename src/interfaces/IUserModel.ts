@@ -10,6 +10,6 @@ interface IUserModel extends Omit<IUserService, 'userLogin'> {
   getUserByEmail({
     email,
   }: IUserLogin): Promise<Omit<IUserData[], 'password'>>,
-};
+}
 
 export default IUserModel;
