@@ -22,6 +22,9 @@ class UserController {
   async userLogin(service: IUserService) {
     const body: IUserLogin = this.req.body;
     const result = await service.userLogin(body);
+    if (Object.keys(result).includes('error')) {
+      return this.next(result);
+    }
     this.res.status(200).json(result);
   }
 }
