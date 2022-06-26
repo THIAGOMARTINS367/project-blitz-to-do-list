@@ -11,8 +11,9 @@ class UserController {
   ) {}
 
   async addNewUser(service: IUserService) {
-    const body: IUSer = this.req.body;
-    const result = await service.addNewUser(body);
+    const { body } = this.req;
+    const user: IUSer = body;
+    const result = await service.addNewUser(user);
     if (Object.keys(result).includes('error')) {
       return this.next(result);
     }
@@ -20,8 +21,9 @@ class UserController {
   }
 
   async userLogin(service: IUserService) {
-    const body: IUserLogin = this.req.body;
-    const result = await service.userLogin(body);
+    const { body } = this.req;
+    const user: IUserLogin = body;
+    const result = await service.userLogin(user);
     if (Object.keys(result).includes('error')) {
       return this.next(result);
     }
