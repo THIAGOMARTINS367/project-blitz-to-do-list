@@ -28,6 +28,14 @@ class UserService implements IUserService {
     return error;
   }
 
+  validateUserLoginFields({ email, password }: IUserLogin): ValidationError | undefined {
+    const { error } = object.keys({
+      email: string.email().not().empty().required(),
+      password: string.not().empty().required(),
+    }).validate({ email, password });
+    return error;
+  }
+
   async addNewUser(user: IUSer): Promise<Omit<IUserData, 'password'> | IResponseError> {
     const validation: ValidationError | undefined = this.validateAddNewUserFields(user);
     if (validation) {
@@ -41,10 +49,22 @@ class UserService implements IUserService {
     return newUser;
   }
 
-  async userLogin(body: IUserLogin): Promise<string> {
+  async userLogin(body: IUserLogin): Promise<string | IResponseError> {
+    const validation: ValidationError | undefined = this.validateUserLoginFields(body);
+    if (validation) {
+      const validationType = validation.details[0].type;
+      if (validationType === 'string.base' || validationType === 'string.email') {
+        return { error: { code: 422, message: validation.message } };
+      }
+      return { error: { code: 400, message: validation.message } };
+    }
     const userExist = await this.model.getUserByEmailAndPassword(body);
-    console.log('userExist:', userExist);
     if (userExist.length === 1) {
+      if (userExist[0].admin === 1) {
+        userExist[0].admin = true;
+      } else {
+        userExist[0].admin = false;
+      }
       return 'Usuário existe !';
     }
     return 'Email ou Senha estão incorretos !';
