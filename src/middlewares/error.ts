@@ -11,5 +11,5 @@ export default (
   if (err.error) {
     return res.status(code).json({ message });
   }
-  return res.status(500).json({message: 'Internal Server Error !'});
+  return res.status(500).json({ message: 'Internal Server Error !' });
 };
