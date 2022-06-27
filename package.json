@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "tsnode": "ts-node src/index.ts",
-    "serverts": "tsnd src/index.ts"
+    "tsnode": "ts-node --files src/index.ts",
+    "serverts": "tsnd --files src/index.ts"
   },
   "repository": {
     "type": "git",
