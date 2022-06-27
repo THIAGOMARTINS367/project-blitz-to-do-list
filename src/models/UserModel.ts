@@ -1,6 +1,7 @@
 import { Pool, ResultSetHeader } from 'mysql2/promise';
-import IUSer from '../interfaces/IUser';
+import IUser from '../interfaces/IUser';
 import IUserData from '../interfaces/IUserData';
+import IUserDb from '../interfaces/IUserDb';
 import IUserLogin from '../interfaces/IUserLogin';
 import IUserModel from '../interfaces/IUserModel';
 import connection from './connection';
@@ -8,10 +9,32 @@ import connection from './connection';
 class UserModel implements IUserModel {
   protected connectionDb: Pool = connection;
 
-  constructor(connectionDb?: Pool) {
+  constructor(
+    connectionDb?: Pool,
+    private userData: Omit<IUserDb[], 'password'> = [],
+  ) {
     if (connectionDb) {
       this.connectionDb = connectionDb;
     }
+  }
+
+  serialize() {
+    const userDataFormatted = this.userData.map(({
+      user_id,
+      admin,
+      first_name,
+      last_name,
+      email,
+      password,
+    }) => ({
+      userId: user_id,
+      admin,
+      firstName: first_name,
+      lastName: last_name,
+      email,
+      password,
+    }));
+    return userDataFormatted;
   }
 
   async addNewUser({
@@ -20,7 +43,7 @@ class UserModel implements IUserModel {
     lastName,
     email,
     password,
-  }: IUSer): Promise<Omit<IUserData, 'password'>> {
+  }: IUser): Promise<Omit<IUserData, 'password'>> {
     const [rows] = await this.connectionDb.execute(
       `INSERT INTO blitz_toDoList.user
         (admin, first_name, last_name, email, password)
@@ -36,7 +59,7 @@ class UserModel implements IUserModel {
     email,
     password,
   }: IUserLogin): Promise<Omit<IUserData[], 'password'>> {
-    const [userData] = await this.connectionDb.execute(
+    const [rows] = await this.connectionDb.execute(
       `SELECT
         user_id, admin, first_name, last_name, email
       FROM
@@ -44,13 +67,15 @@ class UserModel implements IUserModel {
       WHERE email = ? AND password = ?`,
       [email, password],
     );
-    return userData as Omit<IUserData[], 'password'>;
+    this.userData = rows as Omit<IUserDb[], 'password'>;
+    const userDataFormatted = this.serialize();
+    return userDataFormatted as Omit<IUserData[], 'password'>;
   }
 
   async getUserByEmail({
     email,
   }: IUserLogin): Promise<Omit<IUserData[], 'password'>> {
-    const [userData] = await this.connectionDb.execute(
+    const [rows] = await this.connectionDb.execute(
       `SELECT
         user_id, admin, first_name, last_name, email
       FROM
@@ -58,7 +83,9 @@ class UserModel implements IUserModel {
       WHERE email = ?`,
       [email],
     );
-    return userData as Omit<IUserData[], 'password'>;
+    this.userData = rows as Omit<IUserDb[], 'password'>;
+    const userDataFormatted = this.serialize();
+    return userDataFormatted as Omit<IUserData[], 'password'>;
   }
 }
 
