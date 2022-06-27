@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
+import superSecretJwt from '../contans';
 import IUserData from '../interfaces/IUserData';
-
-const superSecretJwt: string = process.env.JWT_SECRET || 'default_password';
 
 const generateJwtToken = (
   validity: string,
