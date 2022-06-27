@@ -1,4 +1,4 @@
-interface IUSer {
+interface IUser {
   admin: number | boolean,
   firstName: string,
   lastName: string,
@@ -6,4 +6,4 @@ interface IUSer {
   password: string,
 }
 
-export default IUSer;
+export default IUser;

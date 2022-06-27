@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import IUSer from '../interfaces/IUser';
+import IUser from '../interfaces/IUser';
 import IUserLogin from '../interfaces/IUserLogin';
 import IUserService from '../interfaces/IUserService';
 
@@ -12,7 +12,7 @@ class UserController {
 
   async addNewUser(service: IUserService) {
     const { body } = this.req;
-    const user: IUSer = body;
+    const user: IUser = body;
     const result = await service.addNewUser(user);
     if (Object.keys(result).includes('error')) {
       return this.next(result);

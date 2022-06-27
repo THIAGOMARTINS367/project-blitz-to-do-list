@@ -1,6 +1,6 @@
-import IUSer from './IUser';
+import IUser from './IUser';
 
-interface IUserData extends IUSer {
+interface IUserData extends IUser {
   userId: number,
 }
 
