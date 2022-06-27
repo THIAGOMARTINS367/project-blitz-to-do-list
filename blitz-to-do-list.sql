@@ -17,8 +17,8 @@ CREATE TABLE task (
   task_content VARCHAR(500) NOT NULL,
   status VARCHAR(15) NOT NULL,
   user_id INTEGER NOT NULL,
-  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id)
     REFERENCES user (user_id)
     ON DELETE CASCADE
@@ -33,7 +33,7 @@ VALUES
   (false, 'João', 'Pedro', 'joao@gmail.com', 'joao123');
 
 INSERT INTO
-  task (task_content, status, user_id, createdAt, updatedAt)
+  task (task_content, status, user_id, created_at, updated_at)
 VALUES
   ('Fazer relatório trimestral', 'pendente', 1, NOW(), NOW()),
   ('Terminar Projeto', 'pendente', 2, NOW(), NOW());
