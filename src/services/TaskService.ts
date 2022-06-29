@@ -8,7 +8,7 @@ import IUserData from '../interfaces/IUserData';
 class TaskService implements ITaskService {
   constructor(private model: ITaskModel, private joiTypes = Joi.types()) {}
 
-  validateAddNewTaskFields({ taskContent, status }: ITask): ValidationError | undefined {
+  validateFields({ taskContent, status }: ITask): ValidationError | undefined {
     const { object, string } = this.joiTypes;
     const { error } = object.keys({
       taskContent: string.not().empty().max(500).required(),
@@ -24,7 +24,7 @@ class TaskService implements ITaskService {
 
   async addNewTask({ userId }: IUserData, body: ITask[]): Promise<{ message: string } | IResponseError> {
     for (let index = 0; index < body.length; index += 1) {
-      const validation = this.validateAddNewTaskFields(body[index]);
+      const validation = this.validateFields(body[index]);
       if (validation) {
         const validationType = validation.details[0].type;
         if (validationType === 'string.base') {
@@ -45,7 +45,15 @@ class TaskService implements ITaskService {
     return message;
   }
 
-  async updateTask(userData: IUserData, taskId: number, body: ITask): Promise<{ message: string }> {
+  async updateTask(userData: IUserData, taskId: number, body: ITask): Promise<{ message: string } | IResponseError> {
+    const validation = this.validateFields(body);
+    if (validation) {
+      const validationType = validation.details[0].type;
+      if (validationType === 'string.base') {
+        return { error: { code: 422, message: validation.message } };
+      }
+      return { error: { code: 400, message: validation.message } };
+    };
     const message = await this.model.updateTask(userData, taskId, body);
     return message;
   }
