@@ -17,12 +17,17 @@ class TaskService implements ITaskService {
     return error;
   }
 
+  async validateUserExist(userId: number): Promise<Omit<IUserData, 'password'>> {
+    const userExists = await this.model.getUserById(userId);
+    return userExists[0];
+  }
+
   async getUserTaskList(userData: IUserData): Promise<Omit<ITask[], 'userId'>> {
     const tasks = await this.model.getUserTaskList(userData);
     return tasks;
   }
 
-  async addNewTask({ userId }: IUserData, body: ITask[]): Promise<{ message: string } | IResponseError> {
+  async addNewTask({ userId, firstName, lastName }: IUserData, body: ITask[]): Promise<{ message: string } | IResponseError> {
     for (let index = 0; index < body.length; index += 1) {
       const validation = this.validateFields(body[index]);
       if (validation) {
@@ -32,6 +37,10 @@ class TaskService implements ITaskService {
         }
         return { error: { code: 400, message: validation.message } };
       };
+    }
+    const userExist = await this.validateUserExist(userId);
+    if (!userExist) {
+      return { error: { code: 404, message: `User ${firstName} ${lastName} does not exist!` } };
     }
     const tasksData: (string | number)[] = [];
     const queryInjection: string[] = [];
