@@ -79,6 +79,10 @@ class TaskService implements ITaskService {
     if (!userExist) {
       return { error: { code: 404, message: `User ${firstName} ${lastName} does not exist!` } };
     }
+    const taskExists = await this.model.getUserTaskById(userData, taskId);
+    if (!taskExists[0]) {
+      return { error: { code: 400, message: `Task with id ${taskId} does not exist` } };
+    }
     const message = await this.model.updateTask(userData, taskId, body);
     return message;
   }
