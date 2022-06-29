@@ -44,6 +44,16 @@ app.post(
   },
 );
 
+app.put(
+  '/to-do-list/:taskId',
+  (req, _res, next) => new TokenAuthenticator(req, next).validateJwtToken(),
+  (req, res, next) => {
+    new TaskController(req, res, next).updateTask(
+      new TaskService(new TaskModel()),
+    );
+  },
+);
+
 app.use(errorMiddleware);
 
 export default app;
