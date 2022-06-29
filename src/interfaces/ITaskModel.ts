@@ -8,6 +8,7 @@ interface ITaskModel extends Omit<ITaskService, 'addNewTask'> {
     tasksData: (string | number)[],
     queryInjection: string[]
   ): Promise<{ message: string }>;
+  getUserTaskById(userData: IUserData, taskId: number): Promise<ITask[]>;
   getUserById(userId: number): Promise<Omit<IUserData[], 'password'>>;
 }
 
