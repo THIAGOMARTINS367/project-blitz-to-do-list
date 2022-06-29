@@ -62,7 +62,7 @@ class TaskService implements ITaskService {
     return message;
   }
 
-  async updateTask(userData: IUserData, taskId: number, body: ITask): Promise<{ message: string } | IResponseError> {
+  async updateTask(userData: IUserData, taskId: number, body: ITask): Promise<ITask | IResponseError> {
     const { userId, firstName, lastName } = userData;
     if (typeof body !== 'object' || Object.keys(body).length === 0) {
       return { error: { code: 400, message: 'Request body must be an array with at least 1 object!' } };
@@ -79,12 +79,13 @@ class TaskService implements ITaskService {
     if (!userExist) {
       return { error: { code: 404, message: `User ${firstName} ${lastName} does not exist!` } };
     }
-    const taskExists = await this.model.getUserTaskById(userData, taskId);
+    const taskExists: ITask[] = await this.model.getUserTaskById(userData, taskId);
     if (!taskExists[0]) {
       return { error: { code: 400, message: `Task with id ${taskId} does not exist` } };
     }
-    const message = await this.model.updateTask(userData, taskId, body);
-    return message;
+    body.createdAt = taskExists[0].createdAt;
+    const updatedTask = await this.model.updateTask(userData, taskId, body);
+    return updatedTask;
   }
 }
 export default TaskService;
