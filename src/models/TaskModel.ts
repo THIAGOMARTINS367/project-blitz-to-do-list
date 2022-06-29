@@ -87,6 +87,16 @@ class TaskModel implements ITaskModel {
     return { message: 'Tasks successfully updated!' };
   }
 
+  async getUserTaskById({ userId }: IUserData, taskId: number): Promise<ITask[]> {
+    const [rows] = await this.connectionDb.execute(
+      `SELECT * FROM blitz_toDoList.task WHERE user_id = ? AND task_id = ?`,
+      [userId, taskId],
+    );
+    this.taskList = rows as ITaskDb[];
+    const taskFormatted = this.serialize();
+    return taskFormatted as ITask[];
+  }
+
   async getUserById(userId: number): Promise<Omit<IUserData[], 'password'>> {
     const [rows] = await this.connectionDb.execute(
       `SELECT
