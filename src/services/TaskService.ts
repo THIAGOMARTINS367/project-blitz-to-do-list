@@ -24,8 +24,12 @@ class TaskService implements ITaskService {
 
   async addNewTask({ userId }: IUserData, body: ITask[]): Promise<{ message: string } | IResponseError> {
     for (let index = 0; index < body.length; index += 1) {
-      let validation = this.validateAddNewTaskFields(body[index]);
+      const validation = this.validateAddNewTaskFields(body[index]);
       if (validation) {
+        const validationType = validation.details[0].type;
+        if (validationType === 'string.base') {
+          return { error: { code: 422, message: validation.message } };
+        }
         return { error: { code: 400, message: validation.message } };
       };
     }
