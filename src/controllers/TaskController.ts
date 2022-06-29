@@ -16,6 +16,15 @@ class TaskController {
     }
     this.res.status(200).json(result);
   }
+
+  async addNewTask(service: ITaskService) {
+    const { userData, body } = this.req;
+    const result = await service.addNewTask(userData, body);
+    if (Object.keys(result).includes('error')) {
+      return this.next(result);
+    }
+    this.res.status(201).json(result);
+  }
 }
 
 export default TaskController;
