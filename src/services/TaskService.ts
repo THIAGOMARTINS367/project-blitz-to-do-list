@@ -22,7 +22,12 @@ class TaskService implements ITaskService {
     return userExists[0];
   }
 
-  async getUserTaskList(userData: IUserData): Promise<Omit<ITask[], 'userId'>> {
+  async getUserTaskList(userData: IUserData): Promise<Omit<ITask[], 'userId'> | IResponseError> {
+    const { userId, firstName, lastName } = userData;
+    const userExist = await this.validateUserExist(userId);
+    if (!userExist) {
+      return { error: { code: 404, message: `User ${firstName} ${lastName} does not exist!` } };
+    }
     const tasks = await this.model.getUserTaskList(userData);
     return tasks;
   }
@@ -55,6 +60,7 @@ class TaskService implements ITaskService {
   }
 
   async updateTask(userData: IUserData, taskId: number, body: ITask): Promise<{ message: string } | IResponseError> {
+    const { userId, firstName, lastName } = userData;
     const validation = this.validateFields(body);
     if (validation) {
       const validationType = validation.details[0].type;
@@ -63,6 +69,10 @@ class TaskService implements ITaskService {
       }
       return { error: { code: 400, message: validation.message } };
     };
+    const userExist = await this.validateUserExist(userId);
+    if (!userExist) {
+      return { error: { code: 404, message: `User ${firstName} ${lastName} does not exist!` } };
+    }
     const message = await this.model.updateTask(userData, taskId, body);
     return message;
   }
