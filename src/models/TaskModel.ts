@@ -22,7 +22,7 @@ class TaskModel implements ITaskModel {
         status,
         createdAt: created_at,
         updatedAt: updated_at,
-      }),
+      })
     );
     return taskListFormatted as Omit<ITask[], 'userId'>;
   }
@@ -32,7 +32,7 @@ class TaskModel implements ITaskModel {
   }: IUserData): Promise<Omit<ITask[], 'userId'>> {
     const [rows] = await this.connectionDb.execute(
       'SELECT * FROM blitz_toDoList.task WHERE user_id = ?',
-      [userId],
+      [userId]
     );
     this.taskList = rows as ITaskDb[];
     const taskListFormatted = this.serialize();
@@ -41,17 +41,32 @@ class TaskModel implements ITaskModel {
 
   async addNewTask(
     tasksData: (string | number)[],
-    queryInjection: string[],
+    queryInjection: string[]
   ): Promise<{ message: string }> {
     const [rows] = await this.connectionDb.execute(
       `INSERT INTO
         blitz_toDoList.task (task_content, status, user_id)
       VALUES
         ${queryInjection.join(',')}`,
-      [...tasksData],
+      [...tasksData]
     );
     this.taskList = rows as ITaskDb[];
     return { message: 'Tasks saved successfully!' };
+  }
+
+  async updateTask(
+    { userId }: IUserData,
+    taskId:number,
+    { taskContent, status }: ITask,
+  ): Promise<{ message: string }> {
+    await this.connectionDb.execute(
+      `UPDATE
+        blitz_toDoList.task
+      SET task_content = ?, status = ?, updated_at = ?
+      WHERE task_id = ? AND user_id = ?`,
+      [taskContent, status, new Date(), taskId, userId],
+    );
+    return { message: 'Tasks successfully updated!' };
   }
 }
 
