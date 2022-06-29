@@ -33,6 +33,9 @@ class TaskService implements ITaskService {
   }
 
   async addNewTask({ userId, firstName, lastName }: IUserData, body: ITask[]): Promise<{ message: string } | IResponseError> {
+    if (typeof body !== 'object' || !Array.isArray(body) || body.length === 0) {
+      return { error: { code: 400, message: 'Request body must be an array with at least 1 object!' } };
+    }
     for (let index = 0; index < body.length; index += 1) {
       const validation = this.validateFields(body[index]);
       if (validation) {
@@ -61,6 +64,9 @@ class TaskService implements ITaskService {
 
   async updateTask(userData: IUserData, taskId: number, body: ITask): Promise<{ message: string } | IResponseError> {
     const { userId, firstName, lastName } = userData;
+    if (typeof body !== 'object' || Object.keys(body).length === 0) {
+      return { error: { code: 400, message: 'Request body must be an array with at least 1 object!' } };
+    }
     const validation = this.validateFields(body);
     if (validation) {
       const validationType = validation.details[0].type;
