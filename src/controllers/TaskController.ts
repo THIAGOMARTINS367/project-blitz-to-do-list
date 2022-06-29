@@ -25,6 +25,15 @@ class TaskController {
     }
     this.res.status(201).json(result);
   }
+
+  async updateTask(service: ITaskService) {
+    const { userData, body, params: { taskId } } = this.req;
+    const result = await service.updateTask(userData, Number(taskId), body);
+    if (Object.keys(result).includes('error')) {
+      return this.next(result);
+    }
+    this.res.status(201).json(result);
+  }
 }
 
 export default TaskController;
