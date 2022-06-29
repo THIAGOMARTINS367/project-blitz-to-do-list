@@ -23,6 +23,10 @@ class TaskService implements ITaskService {
     const message = await this.model.addNewTask(tasksData, queryInjection);
     return message;
   }
-}
 
+  async updateTask(userData: IUserData, taskId: number, body: ITask): Promise<{ message: string }> {
+    const message = await this.model.updateTask(userData, taskId, body);
+    return message;
+  }
+}
 export default TaskService;
