@@ -75,16 +75,17 @@ class TaskModel implements ITaskModel {
   async updateTask(
     { userId }: IUserData,
     taskId: number,
-    { taskContent, status }: ITask
-  ): Promise<{ message: string }> {
+    { taskContent, status, createdAt }: ITask
+  ): Promise<ITask> {
+    const updatedAt = new Date();
     await this.connectionDb.execute(
       `UPDATE
         blitz_toDoList.task
       SET task_content = ?, status = ?, updated_at = ?
       WHERE task_id = ? AND user_id = ?`,
-      [taskContent, status, new Date(), taskId, userId]
+      [taskContent, status, updatedAt, taskId, userId]
     );
-    return { message: 'Tasks successfully updated!' };
+    return { taskId, taskContent, status, createdAt, updatedAt } as ITask;
   }
 
   async getUserTaskById({ userId }: IUserData, taskId: number): Promise<ITask[]> {
