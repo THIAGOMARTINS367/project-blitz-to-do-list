@@ -32,7 +32,7 @@ class TaskController {
     if (Object.keys(result).includes('error')) {
       return this.next(result);
     }
-    this.res.status(201).json(result);
+    this.res.status(200).json(result);
   }
 }
 
