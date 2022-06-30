@@ -34,6 +34,15 @@ class TaskController {
     }
     this.res.status(200).json(result);
   }
+
+  async deleteTasks(service: ITaskService) {
+    const { userData, body } = this.req;
+    const result = await service.deleteTasks(userData, body);
+    if (Object.keys(result).includes('error')) {
+      return this.next(result);
+    }
+    this.res.status(200).json({ deletedTasks: result });
+  }
 }
 
 export default TaskController;
