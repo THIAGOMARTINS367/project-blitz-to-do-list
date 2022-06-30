@@ -54,6 +54,16 @@ app.put(
   },
 );
 
+app.delete(
+  '/to-do-list',
+  (req, _res, next) => new TokenAuthenticator(req, next).validateJwtToken(),
+  (req, res, next) => {
+    new TaskController(req, res, next).deleteTasks(
+      new TaskService(new TaskModel()),
+    );
+  },
+);
+
 app.use(errorMiddleware);
 
 export default app;
