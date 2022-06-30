@@ -17,6 +17,19 @@ class TaskService implements ITaskService {
     return error;
   }
 
+  validateDeleteTasksFields({ tasks }: { tasks: number[] }): ValidationError | undefined {
+    const { object, array } = this.joiTypes;
+    const { error } = object.keys({
+      tasks: array.not().empty().min(1).required(),
+    }).validate({ tasks });
+    if (!tasks.every((element) => typeof element === 'number')) {
+      return {
+        message: 'task ids must be numbers!', details: [{ type: 'isNumber' }],
+      } as ValidationError;
+    }
+    return error;
+  }
+
   async validateUserExist(userId: number): Promise<Omit<IUserData, 'password'>> {
     const userExists = await this.model.getUserById(userId);
     return userExists[0];
@@ -88,10 +101,36 @@ class TaskService implements ITaskService {
     return updatedTask;
   }
 
-  async deleteTasks(userData: IUserData, body: number[]): Promise<number[]> {
+  async deleteTasks(userData: IUserData, body: { tasks: number[] }): Promise<number[] | IResponseError> {
+    console.log(Object.keys(body).length);
+    if (typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length === 0) {
+      return { error: { code: 400, message: 'Request body must be an object with at least 1 attribute!' } };
+    }
+    const validation = this.validateDeleteTasksFields(body);
+    if (validation) {
+      const validationType = validation.details[0].type;
+      if (validationType === 'array.base') {
+        return { error: { code: 422, message: validation.message } };
+      }
+      return { error: { code: 400, message: validation.message } };
+    };
+    const { userId, firstName, lastName } = userData;
+    const userExist = await this.validateUserExist(userId);
+    if (!userExist) {
+      return { error: { code: 404, message: `User ${firstName} ${lastName} does not exist!` } };
+    }
+    const mysqlInjection: string[] = [];
+    body.tasks.forEach(() => mysqlInjection.push('?'));
+    const tasksExists: ITask[] = await this.model.getUserTaskById(userData, body.tasks, mysqlInjection);
+    const tasksExistsIds = tasksExists.map(({ taskId }) => taskId);
+    for (let index = 0; index < body.tasks.length; index += 1) {
+      if (!tasksExistsIds.includes(body.tasks[index])) {
+        return { error: { code: 400, message: `Task with id ${body.tasks[index]} does not exist` } };
+      }
+    }
     const queryInjection: string[] = [];
-    body.forEach(() => queryInjection.push('?'));
-    const deletedTasks = await this.model.deleteTasks(userData, body, queryInjection);
+    body.tasks.forEach(() => queryInjection.push('?'));
+    const deletedTasks = await this.model.deleteTasks(userData, body.tasks, queryInjection);
     return deletedTasks;
   }
 }
