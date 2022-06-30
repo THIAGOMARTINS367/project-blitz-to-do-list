@@ -8,7 +8,10 @@ interface ITaskModel extends Omit<ITaskService, 'addNewTask' | 'deleteTasks'> {
     tasksData: (string | number)[],
     queryInjection: string[],
   ): Promise<{ message: string }>,
-  getUserTaskById(userData: IUserData, taskId: number): Promise<ITask[]>,
+  getUserTaskById(
+    { userId }: IUserData,
+    taskIds: number[],
+    mysqlInjection: string[],): Promise<ITask[]>,
   getUserById(userId: number): Promise<Omit<IUserData[], 'password'>>,
   deleteTasks(userData: IUserData, body: number[], queryInjection: string[]): Promise<number[]>,
 }
