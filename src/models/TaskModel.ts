@@ -88,10 +88,13 @@ class TaskModel implements ITaskModel {
     return { taskId, taskContent, status, createdAt, updatedAt } as ITask;
   }
 
-  async getUserTaskById({ userId }: IUserData, taskId: number): Promise<ITask[]> {
+  async getUserTaskById(
+    { userId }: IUserData,
+    taskId: number
+  ): Promise<ITask[]> {
     const [rows] = await this.connectionDb.execute(
       `SELECT * FROM blitz_toDoList.task WHERE user_id = ? AND task_id = ?`,
-      [userId, taskId],
+      [userId, taskId]
     );
     this.taskList = rows as ITaskDb[];
     const taskFormatted = this.serialize();
@@ -108,6 +111,20 @@ class TaskModel implements ITaskModel {
     this.userData = rows as Omit<IUserDb[], 'password'>;
     const userDataFormatted = this.serializeUser();
     return userDataFormatted as Omit<IUserData[], 'password'>;
+  }
+
+  async deleteTasks(
+    { userId }: IUserData,
+    body: number[],
+    queryInjection: string[],
+  ): Promise<number[]> {
+    await this.connectionDb.execute(
+      `DELETE FROM
+        blitz_toDoList.task
+      WHERE user_id = ? AND task_id IN(${queryInjection.join(',')})`,
+      [userId, ...body],
+    );
+    return body;
   }
 }
 
