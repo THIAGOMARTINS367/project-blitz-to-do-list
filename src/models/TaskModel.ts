@@ -90,11 +90,12 @@ class TaskModel implements ITaskModel {
 
   async getUserTaskById(
     { userId }: IUserData,
-    taskId: number
+    taskIds: number[],
+    mysqlInjection: string[],
   ): Promise<ITask[]> {
     const [rows] = await this.connectionDb.execute(
-      `SELECT * FROM blitz_toDoList.task WHERE user_id = ? AND task_id = ?`,
-      [userId, taskId]
+      `SELECT * FROM blitz_toDoList.task WHERE user_id = ? AND task_id IN(${mysqlInjection.join(',')})`,
+      [userId, ...taskIds]
     );
     this.taskList = rows as ITaskDb[];
     const taskFormatted = this.serialize();
