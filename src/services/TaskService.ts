@@ -87,5 +87,12 @@ class TaskService implements ITaskService {
     const updatedTask = await this.model.updateTask(userData, taskId, body);
     return updatedTask;
   }
+
+  async deleteTasks(userData: IUserData, body: number[]): Promise<number[]> {
+    const queryInjection: string[] = [];
+    body.forEach(() => queryInjection.push('?'));
+    const deletedTasks = await this.model.deleteTasks(userData, body, queryInjection);
+    return deletedTasks;
+  }
 }
 export default TaskService;
