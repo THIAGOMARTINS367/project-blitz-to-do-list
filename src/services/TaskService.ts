@@ -1,4 +1,4 @@
-import Joi, { ValidationError } from 'joi';
+import Joi from 'joi';
 import IResponseError from '../interfaces/IResponseError';
 import ITask from '../interfaces/ITask';
 import ITaskModel from '../interfaces/ITaskModel';
@@ -55,12 +55,22 @@ class TaskService implements ITaskService {
 
   validateDeleteTasksFields({
     tasks,
-  }: { tasks: number[] }): ValidationError | undefined {
+  }: { tasks: number[] }): undefined | IResponseError {
     const { object, array } = this.joiTypes;
     const { error } = object.keys({
       tasks: array.not().empty().min(1)
         .required(),
     }).validate({ tasks });
+    if (error) {
+      const validationType = error.details[0].type;
+      if (validationType === 'array.base') {
+        return { error: { code: 422, message: error.message } };
+      }
+      return { error: { code: 400, message: error.message } };
+    }
+    if (!error && !tasks.every((element) => typeof element === 'number')) {
+      return { error: { code: 400, message: 'Task ids must be numbers!' } };
+    }
     return error;
   }
 
@@ -169,28 +179,15 @@ class TaskService implements ITaskService {
     return updatedTask;
   }
 
-  async deleteTasks(
-    userData: IUserData,
-    body: { tasks: number[] },
-  ): Promise<number[] | IResponseError> {
+  async deleteTasks(userData: IUserData, body: { tasks: number[] }):
+  Promise<number[] | IResponseError> {
     this.requestBody = body;
     const bodyValidation = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
     const validation = this.validateDeleteTasksFields(body);
-    if (validation) {
-      const validationType = validation.details[0].type;
-      if (validationType === 'array.base') {
-        return { error: { code: 422, message: validation.message } };
-      }
-      return { error: { code: 400, message: validation.message } };
-    }
-    if (!body.tasks.every((element) => typeof element === 'number')) {
-      return { error: { code: 400, message: 'Task ids must be numbers!' } };
-    }
+    if (validation) return validation;
     const userExist = await this.validateUserExist(userData);
-    if (Object.keys(userExist).includes('error')) {
-      return userExist as IResponseError;
-    }
+    if (Object.keys(userExist).includes('error')) return userExist as IResponseError;
     const taskExists = await this.validateTaskExists(userData, body.tasks);
     if (Object.keys(taskExists).includes('error')) return taskExists as IResponseError;
     const queryInjection: string[] = [];
