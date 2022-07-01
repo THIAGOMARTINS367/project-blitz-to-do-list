@@ -1,7 +1,6 @@
 import { Pool, ResultSetHeader } from 'mysql2/promise';
 import IUser from '../interfaces/IUser';
 import IUserData from '../interfaces/IUserData';
-import IUserDb from '../interfaces/IUserDb';
 import IUserLogin from '../interfaces/IUserLogin';
 import IUserModel from '../interfaces/IUserModel';
 import connection from './connection';
