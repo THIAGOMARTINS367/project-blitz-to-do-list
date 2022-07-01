@@ -43,7 +43,7 @@ class UserModel implements IUserModel {
     lastName,
     email,
     password,
-  }: IUser): Promise<Omit<IUserData, 'password'>> {
+  }: IUser): Promise<IUserData> {
     const [rows] = await this.connectionDb.execute(
       `INSERT INTO blitz_toDoList.user
         (admin, first_name, last_name, email, password)
@@ -58,7 +58,7 @@ class UserModel implements IUserModel {
   async getUserByEmailAndPassword({
     email,
     password,
-  }: IUserLogin): Promise<Omit<IUserData[], 'password'>> {
+  }: IUserLogin): Promise<IUserData[]> {
     const [rows] = await this.connectionDb.execute(
       `SELECT
         user_id, admin, first_name, last_name, email
@@ -69,12 +69,12 @@ class UserModel implements IUserModel {
     );
     this.userData = rows as Omit<IUserDb[], 'password'>;
     const userDataFormatted = this.serialize();
-    return userDataFormatted as Omit<IUserData[], 'password'>;
+    return userDataFormatted as IUserData[];
   }
 
   async getUserByEmail({
     email,
-  }: IUserLogin): Promise<Omit<IUserData[], 'password'>> {
+  }: IUserLogin): Promise<IUserData[]> {
     const [rows] = await this.connectionDb.execute(
       `SELECT
         user_id, admin, first_name, last_name, email
@@ -85,7 +85,7 @@ class UserModel implements IUserModel {
     );
     this.userData = rows as Omit<IUserDb[], 'password'>;
     const userDataFormatted = this.serialize();
-    return userDataFormatted as Omit<IUserData[], 'password'>;
+    return userDataFormatted as IUserData[];
   }
 }
 

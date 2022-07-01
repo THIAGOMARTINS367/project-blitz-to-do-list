@@ -47,7 +47,7 @@ class UserService implements IUserService {
 
   async addNewUser(
     user: IUser,
-  ): Promise<Omit<IUserData, 'password'> | IResponseError> {
+  ): Promise<IUserData | IResponseError> {
     const validation: ValidationError | undefined = this.validateAddNewUserFields(user);
     if (validation) {
       const validationType = validation.details[0].type;
