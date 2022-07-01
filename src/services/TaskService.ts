@@ -10,7 +10,7 @@ class TaskService implements ITaskService {
     private model: ITaskModel,
     private joiTypes = Joi.types(),
     private requestBody: ITask[] | ITask | { tasks: number[] } = { tasks: [0] },
-  ) {}
+  ) { }
 
   requestBodyIsArray() {
     const body = this.requestBody;
@@ -35,7 +35,7 @@ class TaskService implements ITaskService {
     return undefined;
   }
 
-  validateFields({ taskContent, status }: ITask): ValidationError | undefined {
+  validateFields({ taskContent, status }: ITask): undefined | IResponseError {
     const { object, string } = this.joiTypes;
     const { error } = object.keys({
       taskContent: string.not().empty().max(500)
@@ -43,6 +43,13 @@ class TaskService implements ITaskService {
       status: string.not().empty().valid('pendente', 'em andamento', 'pronto')
         .required(),
     }).validate({ taskContent, status });
+    if (error) {
+      const validationType = error.details[0].type;
+      if (validationType === 'string.base') {
+        return { error: { code: 422, message: error.message } };
+      }
+      return { error: { code: 400, message: error.message } };
+    }
     return error;
   }
 
@@ -74,6 +81,26 @@ class TaskService implements ITaskService {
     return userExists[0];
   }
 
+  async validateTaskExists(userData: IUserData, taskIds: number[]):
+  Promise<ITask[] | IResponseError> {
+    const queryInjection: string[] = [];
+    taskIds.forEach(() => queryInjection.push('?'));
+    const taskExists: ITask[] = await this.model.getUserTaskById(
+      userData,
+      taskIds,
+      queryInjection,
+    );
+    const taskExistsIds = taskExists.map(({ taskId }) => taskId);
+    for (let index = 0; index < taskIds.length; index += 1) {
+      if (!taskExistsIds.includes(taskIds[index])) {
+        return {
+          error: { code: 400, message: `Task with id ${taskIds[index]} does not exist` },
+        };
+      }
+    }
+    return taskExists;
+  }
+
   async getUserTaskList(
     userData: IUserData,
   ): Promise<Omit<ITask[], 'userId'> | IResponseError> {
@@ -89,21 +116,26 @@ class TaskService implements ITaskService {
     const body = this.requestBody as ITask[];
     for (let index = 0; index < body.length; index += 1) {
       const validation = this.validateFields(body[index]);
-      if (validation) {
-        const validationType = validation.details[0].type;
-        if (validationType === 'string.base') {
-          return { error: { code: 422, message: validation.message } };
-        }
-        return { error: { code: 400, message: validation.message } };
-      }
+      if (validation) return validation;
     }
     return undefined;
   }
 
-  async addNewTask(
-    userData: IUserData,
-    body: ITask[],
-  ): Promise<{ message: string } | IResponseError> {
+  generateInjectionQuery(userId: number) {
+    const dataArray: (string | number)[] = [];
+    const queryInjection: string[] = [];
+    const body = this.requestBody as ITask[];
+    body.forEach(({ taskContent, status }: ITask) => {
+      dataArray.push(taskContent);
+      dataArray.push(status);
+      dataArray.push(userId);
+      queryInjection.push('(?,?,?)');
+    });
+    return { dataArray, queryInjection };
+  }
+
+  async addNewTask(userData: IUserData, body: ITask[]):
+  Promise<{ message: string } | IResponseError> {
     this.requestBody = body;
     const bodyValidation = this.requestBodyIsArray();
     if (bodyValidation) return bodyValidation;
@@ -111,17 +143,8 @@ class TaskService implements ITaskService {
     if (joiValidation) return joiValidation;
     const { userId } = userData;
     const userExist = await this.validateUserExist(userData);
-    if (Object.keys(userExist).includes('error')) {
-      return userExist as IResponseError;
-    }
-    const tasksData: (string | number)[] = [];
-    const queryInjection: string[] = [];
-    body.forEach(({ taskContent, status }: ITask) => {
-      tasksData.push(taskContent);
-      tasksData.push(status);
-      tasksData.push(userId);
-      queryInjection.push('(?,?,?)');
-    });
+    if (Object.keys(userExist).includes('error')) return userExist as IResponseError;
+    const { dataArray: tasksData, queryInjection } = this.generateInjectionQuery(userId);
     const message = await this.model.addNewTask(tasksData, queryInjection);
     return message;
   }
@@ -134,31 +157,14 @@ class TaskService implements ITaskService {
     this.requestBody = body;
     const bodyValidation = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
-    const validation = this.validateFields(body);
-    if (validation) {
-      const validationType = validation.details[0].type;
-      if (validationType === 'string.base') {
-        return { error: { code: 422, message: validation.message } };
-      }
-      return { error: { code: 400, message: validation.message } };
-    }
+    const joiValidation = this.validateFields(body);
+    if (joiValidation) return joiValidation;
     const userExist = await this.validateUserExist(userData);
-    if (Object.keys(userExist).includes('error')) {
-      return userExist as IResponseError;
-    }
-    const queryInjection: string[] = [];
-    [taskId].forEach(() => queryInjection.push('?'));
-    const taskExists: ITask[] = await this.model.getUserTaskById(
-      userData,
-      [taskId],
-      queryInjection,
-    );
-    if (!taskExists[0]) {
-      return {
-        error: { code: 400, message: `Task with id ${taskId} does not exist` },
-      };
-    }
-    this.requestBody.createdAt = taskExists[0].createdAt;
+    if (Object.keys(userExist).includes('error')) return userExist as IResponseError;
+    const taskExists = await this.validateTaskExists(userData, [taskId]);
+    if (Object.keys(taskExists).includes('error')) return taskExists as IResponseError;
+    const task = taskExists as ITask[];
+    this.requestBody.createdAt = task[0].createdAt;
     const updatedTask = await this.model.updateTask(userData, taskId, this.requestBody);
     return updatedTask;
   }
@@ -185,24 +191,8 @@ class TaskService implements ITaskService {
     if (Object.keys(userExist).includes('error')) {
       return userExist as IResponseError;
     }
-    const mysqlInjection: string[] = [];
-    body.tasks.forEach(() => mysqlInjection.push('?'));
-    const tasksExists: ITask[] = await this.model.getUserTaskById(
-      userData,
-      body.tasks,
-      mysqlInjection,
-    );
-    const tasksExistsIds = tasksExists.map(({ taskId }) => taskId);
-    for (let index = 0; index < body.tasks.length; index += 1) {
-      if (!tasksExistsIds.includes(body.tasks[index])) {
-        return {
-          error: {
-            code: 400,
-            message: `Task with id ${body.tasks[index]} does not exist`,
-          },
-        };
-      }
-    }
+    const taskExists = await this.validateTaskExists(userData, body.tasks);
+    if (Object.keys(taskExists).includes('error')) return taskExists as IResponseError;
     const queryInjection: string[] = [];
     body.tasks.forEach(() => queryInjection.push('?'));
     const deletedTasks = await this.model.deleteTasks(
