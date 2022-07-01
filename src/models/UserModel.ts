@@ -11,28 +11,10 @@ class UserModel implements IUserModel {
 
   constructor(
     connectionDb?: Pool,
-    private userData: IUserDb[] = [],
   ) {
     if (connectionDb) {
       this.connectionDb = connectionDb;
     }
-  }
-
-  serialize(): IUserData[] {
-    const userDataFormatted: IUserData[] = this.userData.map(({
-      user_id,
-      admin,
-      first_name,
-      last_name,
-      email,
-    }) => ({
-      userId: user_id,
-      admin,
-      firstName: first_name,
-      lastName: last_name,
-      email,
-    }));
-    return userDataFormatted;
   }
 
   async addNewUser({
@@ -59,15 +41,14 @@ class UserModel implements IUserModel {
   }: IUserLogin): Promise<IUserData[]> {
     const [rows] = await this.connectionDb.execute(
       `SELECT
-        user_id, admin, first_name, last_name, email
+        user_id AS userId, admin, first_name AS firstName, last_name AS lastName, email
       FROM
         blitz_toDoList.user
       WHERE email = ? AND password = ?`,
       [email, password],
     );
-    this.userData = rows as IUserDb[];
-    const userDataFormatted = this.serialize();
-    return userDataFormatted as IUserData[];
+    const userData = rows as IUserData[];
+    return userData as IUserData[];
   }
 
   async getUserByEmail({
@@ -75,15 +56,14 @@ class UserModel implements IUserModel {
   }: IUserLogin): Promise<IUserData[]> {
     const [rows] = await this.connectionDb.execute(
       `SELECT
-        user_id, admin, first_name, last_name, email
+        user_id AS userId, admin, first_name AS firstName, last_name AS lastName, email
       FROM
         blitz_toDoList.user
       WHERE email = ?`,
       [email],
     );
-    this.userData = rows as IUserDb[];
-    const userDataFormatted = this.serialize();
-    return userDataFormatted as IUserData[];
+    const userData = rows as IUserData[];
+    return userData as IUserData[];
   }
 }
 
