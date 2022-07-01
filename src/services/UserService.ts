@@ -66,7 +66,7 @@ class UserService implements IUserService {
     return newUser;
   }
 
-  formatUserLoginAttribute({ admin }: IUser): boolean {
+  formatUserLoginAttribute({ admin }: IUserData): boolean {
     if (admin === 1) {
       this.adminFormatted = true;
     }
