@@ -11,28 +11,26 @@ class UserModel implements IUserModel {
 
   constructor(
     connectionDb?: Pool,
-    private userData: Omit<IUserDb[], 'password'> = [],
+    private userData: IUserDb[] = [],
   ) {
     if (connectionDb) {
       this.connectionDb = connectionDb;
     }
   }
 
-  serialize() {
-    const userDataFormatted = this.userData.map(({
+  serialize(): IUserData[] {
+    const userDataFormatted: IUserData[] = this.userData.map(({
       user_id,
       admin,
       first_name,
       last_name,
       email,
-      password,
     }) => ({
       userId: user_id,
       admin,
       firstName: first_name,
       lastName: last_name,
       email,
-      password,
     }));
     return userDataFormatted;
   }
@@ -67,7 +65,7 @@ class UserModel implements IUserModel {
       WHERE email = ? AND password = ?`,
       [email, password],
     );
-    this.userData = rows as Omit<IUserDb[], 'password'>;
+    this.userData = rows as IUserDb[];
     const userDataFormatted = this.serialize();
     return userDataFormatted as IUserData[];
   }
@@ -83,7 +81,7 @@ class UserModel implements IUserModel {
       WHERE email = ?`,
       [email],
     );
-    this.userData = rows as Omit<IUserDb[], 'password'>;
+    this.userData = rows as IUserDb[];
     const userDataFormatted = this.serialize();
     return userDataFormatted as IUserData[];
   }
