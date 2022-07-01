@@ -12,6 +12,8 @@ const app = express();
 
 app.use(express.json());
 
+const TO_DO_LIST_ROUTE = '/to-do-list';
+
 app.post('/sign-up', (req, res, next) => {
   new UserController(req, res, next).addNewUser(
     new UserService(new UserModel()),
@@ -25,7 +27,7 @@ app.post('/login', (req, res, next) => {
 });
 
 app.get(
-  '/to-do-list',
+  TO_DO_LIST_ROUTE,
   (req, _res, next) => new TokenAuthenticator(req, next).validateJwtToken(),
   (req, res, next) => {
     new TaskController(req, res, next).getUserTaskList(
@@ -35,7 +37,7 @@ app.get(
 );
 
 app.post(
-  '/to-do-list',
+  TO_DO_LIST_ROUTE,
   (req, _res, next) => new TokenAuthenticator(req, next).validateJwtToken(),
   (req, res, next) => {
     new TaskController(req, res, next).addNewTask(
@@ -45,7 +47,7 @@ app.post(
 );
 
 app.put(
-  '/to-do-list/:taskId',
+  `${TO_DO_LIST_ROUTE}/:taskId`,
   (req, _res, next) => new TokenAuthenticator(req, next).validateJwtToken(),
   (req, res, next) => {
     new TaskController(req, res, next).updateTask(
@@ -55,7 +57,7 @@ app.put(
 );
 
 app.delete(
-  '/to-do-list',
+  TO_DO_LIST_ROUTE,
   (req, _res, next) => new TokenAuthenticator(req, next).validateJwtToken(),
   (req, res, next) => {
     new TaskController(req, res, next).deleteTasks(
