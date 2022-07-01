@@ -3,7 +3,6 @@ import ITaskService from './ITaskService';
 import IUserData from './IUserData';
 
 interface ITaskModel extends Omit<ITaskService, 'addNewTask' | 'deleteTasks'> {
-  serialize(): Omit<ITask[], 'userId'>,
   addNewTask(
     tasksData: (string | number)[],
     queryInjection: string[],
