@@ -2,7 +2,6 @@ import { Pool } from 'mysql2/promise';
 import ITask from '../interfaces/ITask';
 import ITaskModel from '../interfaces/ITaskModel';
 import IUserData from '../interfaces/IUserData';
-import IUserDb from '../interfaces/IUserDb';
 import connection from './connection';
 
 class TaskModel implements ITaskModel {
