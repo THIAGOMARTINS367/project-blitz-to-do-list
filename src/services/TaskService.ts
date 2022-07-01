@@ -22,11 +22,6 @@ class TaskService implements ITaskService {
     const { error } = object.keys({
       tasks: array.not().empty().min(1).required(),
     }).validate({ tasks });
-    if (!tasks.every((element) => typeof element === 'number')) {
-      return {
-        message: 'task ids must be numbers!', details: [{ type: 'isNumber' }],
-      } as ValidationError;
-    }
     return error;
   }
 
@@ -77,8 +72,8 @@ class TaskService implements ITaskService {
 
   async updateTask(userData: IUserData, taskId: number, body: ITask): Promise<ITask | IResponseError> {
     const { userId, firstName, lastName } = userData;
-    if (typeof body !== 'object' || Object.keys(body).length === 0) {
-      return { error: { code: 400, message: 'Request body must be an array with at least 1 object!' } };
+    if (typeof body !== 'object') {
+      return { error: { code: 400, message: 'The request body must be an object!' } };
     }
     const validation = this.validateFields(body);
     if (validation) {
@@ -104,9 +99,11 @@ class TaskService implements ITaskService {
   }
 
   async deleteTasks(userData: IUserData, body: { tasks: number[] }): Promise<number[] | IResponseError> {
-    console.log(Object.keys(body).length);
-    if (typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length === 0) {
-      return { error: { code: 400, message: 'Request body must be an object with at least 1 attribute!' } };
+    if (typeof body !== 'object' || !Object.keys(body).includes('tasks')) {
+      return { error: {
+        code: 400,
+        message: 'The request body must be an object with just the "tasks" attribute!',
+      } };
     }
     const validation = this.validateDeleteTasksFields(body);
     if (validation) {
@@ -116,6 +113,9 @@ class TaskService implements ITaskService {
       }
       return { error: { code: 400, message: validation.message } };
     };
+    if (!body.tasks.every((element) => typeof element === 'number')) {
+      return { error: { code: 400, message: 'Task ids must be numbers!' } };
+    }
     const { userId, firstName, lastName } = userData;
     const userExist = await this.validateUserExist(userId);
     if (!userExist) {
