@@ -37,30 +37,23 @@ class TaskService implements ITaskService {
 
   validateFields({ taskContent, status }: ITask): ValidationError | undefined {
     const { object, string } = this.joiTypes;
-    const { error } = object
-      .keys({
-        taskContent: string.not().empty().max(500).required(),
-        status: string
-          .not()
-          .empty()
-          .valid('pendente', 'em andamento', 'pronto')
-          .required(),
-      })
-      .validate({ taskContent, status });
+    const { error } = object.keys({
+      taskContent: string.not().empty().max(500)
+        .required(),
+      status: string.not().empty().valid('pendente', 'em andamento', 'pronto')
+        .required(),
+    }).validate({ taskContent, status });
     return error;
   }
 
   validateDeleteTasksFields({
     tasks,
-  }: {
-    tasks: number[];
-  }): ValidationError | undefined {
+  }: { tasks: number[] }): ValidationError | undefined {
     const { object, array } = this.joiTypes;
-    const { error } = object
-      .keys({
-        tasks: array.not().empty().min(1).required(),
-      })
-      .validate({ tasks });
+    const { error } = object.keys({
+      tasks: array.not().empty().min(1)
+        .required(),
+    }).validate({ tasks });
     return error;
   }
 
