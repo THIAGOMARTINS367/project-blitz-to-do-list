@@ -10,24 +10,10 @@ class TaskModel implements ITaskModel {
 
   constructor(
     connectionDb?: Pool,
-    private userData: Omit<IUserDb[], 'password'> = [],
   ) {
     if (connectionDb) {
       this.connectionDb = connectionDb;
     }
-  }
-
-  serializeUser() {
-    const userDataFormatted = this.userData.map(
-      ({ user_id, admin, first_name, last_name, email }) => ({
-        userId: user_id,
-        admin,
-        firstName: first_name,
-        lastName: last_name,
-        email,
-      }),
-    );
-    return userDataFormatted;
   }
 
   async getUserTaskList({
@@ -98,16 +84,19 @@ class TaskModel implements ITaskModel {
     return taskList;
   }
 
-  async getUserById(userId: number): Promise<Omit<IUserData[], 'password'>> {
+  async getUserById(userId: number): Promise<IUserData[]> {
     const [rows] = await this.connectionDb.execute(
       `SELECT
-        user_id, admin, first_name, last_name, email
+        user_id AS userId,
+        admin,
+        first_name AS firstName,
+        last_name AS lastName,
+        email
       FROM blitz_toDoList.user WHERE user_id = ?`,
       [userId],
     );
-    this.userData = rows as Omit<IUserDb[], 'password'>;
-    const userDataFormatted = this.serializeUser();
-    return userDataFormatted as Omit<IUserData[], 'password'>;
+    const userData = rows as IUserData[];
+    return userData;
   }
 
   async deleteTasks(
