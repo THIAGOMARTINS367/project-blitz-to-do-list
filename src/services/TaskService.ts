@@ -57,17 +57,13 @@ class TaskService implements ITaskService {
     return error;
   }
 
-  async validateUserExist(userId: number): Promise<Omit<IUserData, 'password'>> {
+  async validateUserExist({
+    userId,
+    firstName,
+    lastName,
+  }: IUserData): Promise<IUserData | IResponseError> {
     const userExists = await this.model.getUserById(userId);
-    return userExists[0];
-  }
-
-  async getUserTaskList(
-    userData: IUserData,
-  ): Promise<Omit<ITask[], 'userId'> | IResponseError> {
-    const { userId, firstName, lastName } = userData;
-    const userExist = await this.validateUserExist(userId);
-    if (!userExist) {
+    if (!userExists[0]) {
       return {
         error: {
           code: 404,
@@ -75,17 +71,22 @@ class TaskService implements ITaskService {
         },
       };
     }
+    return userExists[0];
+  }
+
+  async getUserTaskList(
+    userData: IUserData,
+  ): Promise<Omit<ITask[], 'userId'> | IResponseError> {
+    const userExist = await this.validateUserExist(userData);
+    if (Object.keys(userExist).includes('error')) {
+      return userExist as IResponseError;
+    }
     const tasks = await this.model.getUserTaskList(userData);
     return tasks;
   }
 
-  async addNewTask(
-    { userId, firstName, lastName }: IUserData,
-    body: ITask[],
-  ): Promise<{ message: string } | IResponseError> {
-    this.requestBody = body;
-    const bodyValidation = this.requestBodyIsArray();
-    if (bodyValidation) return bodyValidation;
+  addNewTaskJoiValidation() {
+    const body = this.requestBody as ITask[];
     for (let index = 0; index < body.length; index += 1) {
       const validation = this.validateFields(body[index]);
       if (validation) {
@@ -96,14 +97,22 @@ class TaskService implements ITaskService {
         return { error: { code: 400, message: validation.message } };
       }
     }
-    const userExist = await this.validateUserExist(userId);
-    if (!userExist) {
-      return {
-        error: {
-          code: 404,
-          message: `User ${firstName} ${lastName} does not exist!`,
-        },
-      };
+    return undefined;
+  }
+
+  async addNewTask(
+    userData: IUserData,
+    body: ITask[],
+  ): Promise<{ message: string } | IResponseError> {
+    this.requestBody = body;
+    const bodyValidation = this.requestBodyIsArray();
+    if (bodyValidation) return bodyValidation;
+    const joiValidation = this.addNewTaskJoiValidation();
+    if (joiValidation) return joiValidation;
+    const { userId } = userData;
+    const userExist = await this.validateUserExist(userData);
+    if (Object.keys(userExist).includes('error')) {
+      return userExist as IResponseError;
     }
     const tasksData: (string | number)[] = [];
     const queryInjection: string[] = [];
@@ -122,7 +131,6 @@ class TaskService implements ITaskService {
     taskId: number,
     body: ITask,
   ): Promise<ITask | IResponseError> {
-    const { userId, firstName, lastName } = userData;
     this.requestBody = body;
     const bodyValidation = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
@@ -134,14 +142,9 @@ class TaskService implements ITaskService {
       }
       return { error: { code: 400, message: validation.message } };
     }
-    const userExist = await this.validateUserExist(userId);
-    if (!userExist) {
-      return {
-        error: {
-          code: 404,
-          message: `User ${firstName} ${lastName} does not exist!`,
-        },
-      };
+    const userExist = await this.validateUserExist(userData);
+    if (Object.keys(userExist).includes('error')) {
+      return userExist as IResponseError;
     }
     const queryInjection: string[] = [];
     [taskId].forEach(() => queryInjection.push('?'));
@@ -178,15 +181,9 @@ class TaskService implements ITaskService {
     if (!body.tasks.every((element) => typeof element === 'number')) {
       return { error: { code: 400, message: 'Task ids must be numbers!' } };
     }
-    const { userId, firstName, lastName } = userData;
-    const userExist = await this.validateUserExist(userId);
-    if (!userExist) {
-      return {
-        error: {
-          code: 404,
-          message: `User ${firstName} ${lastName} does not exist!`,
-        },
-      };
+    const userExist = await this.validateUserExist(userData);
+    if (Object.keys(userExist).includes('error')) {
+      return userExist as IResponseError;
     }
     const mysqlInjection: string[] = [];
     body.tasks.forEach(() => mysqlInjection.push('?'));
