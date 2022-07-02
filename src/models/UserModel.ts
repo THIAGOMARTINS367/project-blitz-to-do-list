@@ -17,46 +17,57 @@ class UserModel implements IUserModel {
     email,
     password,
   }: IUser): Promise<IUserData> {
-    const [rows] = await this.connectionDb.execute(
-      `INSERT INTO blitz_toDoList.user
-        (admin, first_name, last_name, email, password)
-      VALUES
-        (?,?,?,?,?)`,
-      [admin, firstName, lastName, email, password],
-    );
-    const { insertId } = rows as ResultSetHeader;
-    return { userId: insertId, admin, firstName, lastName, email };
+    try {
+      const [rows] = await this.connectionDb.execute(
+        `INSERT INTO blitz_toDoList.user
+          (admin, first_name, last_name, email, password)
+        VALUES (?,?,?,?,?)`,
+        [admin, firstName, lastName, email, password],
+      );
+      const { insertId } = rows as ResultSetHeader;
+      return { userId: insertId, admin, firstName, lastName, email };
+    } catch (error) {
+      throw new Error('');
+    }
   }
 
   async getUserByEmailAndPassword({
     email,
     password,
   }: IUserLogin): Promise<IUserData[]> {
-    const [rows] = await this.connectionDb.execute(
-      `SELECT
-        user_id AS userId, admin, first_name AS firstName, last_name AS lastName, email
-      FROM
-        blitz_toDoList.user
-      WHERE email = ? AND password = ?`,
-      [email, password],
-    );
-    const userData = rows as IUserData[];
-    return userData;
+    try {
+      const [rows] = await this.connectionDb.execute(
+        `SELECT
+          user_id AS userId, admin, first_name AS firstName, last_name AS lastName, email
+        FROM
+          blitz_toDoList.user
+        WHERE email = ? AND password = ?`,
+        [email, password],
+      );
+      const userData = rows as IUserData[];
+      return userData;
+    } catch (error) {
+      throw new Error('');
+    }
   }
 
   async getUserByEmail({
     email,
   }: IUserLogin): Promise<IUserData[]> {
-    const [rows] = await this.connectionDb.execute(
-      `SELECT
-        user_id AS userId, admin, first_name AS firstName, last_name AS lastName, email
-      FROM
-        blitz_toDoList.user
-      WHERE email = ?`,
-      [email],
-    );
-    const userData = rows as IUserData[];
-    return userData;
+    try {
+      const [rows] = await this.connectionDb.execute(
+        `SELECT
+          user_id AS userId, admin, first_name AS firstName, last_name AS lastName, email
+        FROM
+          blitz_toDoList.user
+        WHERE email = ?`,
+        [email],
+      );
+      const userData = rows as IUserData[];
+      return userData;
+    } catch (error) {
+      throw new Error('');
+    }
   }
 }
 
