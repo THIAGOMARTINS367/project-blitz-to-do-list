@@ -5,15 +5,9 @@ import IUserData from '../interfaces/IUserData';
 import connection from './connection';
 
 class TaskModel implements ITaskModel {
-  protected connectionDb: Pool = connection;
-
   constructor(
-    connectionDb?: Pool,
-  ) {
-    if (connectionDb) {
-      this.connectionDb = connectionDb;
-    }
-  }
+    private connectionDb: Pool = connection,
+  ) {}
 
   async getUserTaskList({
     userId,
@@ -51,7 +45,7 @@ class TaskModel implements ITaskModel {
     taskId: number,
     { taskContent, status, createdAt }: ITask,
   ): Promise<ITask> {
-    const updatedAt = new Date();
+    const updatedAt: Date = new Date();
     await this.connectionDb.execute(
       `UPDATE
         blitz_toDoList.task
