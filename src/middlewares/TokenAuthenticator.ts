@@ -1,5 +1,5 @@
 import { Request, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import superSecretJwt from '../contans';
 import IJwtToken from '../interfaces/IJwtToken';
 import IUserData from '../interfaces/IUserData';
@@ -10,14 +10,15 @@ class TokenAuthenticator {
     private next: NextFunction,
   ) {}
 
-  validateJwtToken() {
+  validateJwtToken(): void {
     const { headers } = this.req;
-    const { authorization: token } = headers;
+    const { authorization } = headers;
+    const token: string | undefined = authorization;
     if (!token) {
       return this.next({ error: { code: 401, message: 'Token not found' } });
     }
     try {
-      const decoded = jwt.verify(token, superSecretJwt);
+      const decoded: string | JwtPayload = jwt.verify(token, superSecretJwt);
       const { data } = decoded as IJwtToken;
       const userData = { ...data } as IUserData;
       this.req.userData = { ...userData };
