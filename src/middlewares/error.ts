@@ -8,7 +8,7 @@ export default (
   _next: NextFunction,
 ): Response<{ message: string }> => {
   try {
-    const { code, message } = err.error;
+    const { code, message }: { code: number, message: string } = err.error;
     if (err.error) return res.status(code).json({ message });
     return res.status(500).json({ message: 'Internal Server Error !' });
   } catch (error) {
