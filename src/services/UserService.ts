@@ -1,4 +1,4 @@
-import Joi, { ValidationError } from 'joi';
+import Joi, { BooleanSchema, ObjectSchema, StringSchema, ValidationError } from 'joi';
 import IResponseError from '../interfaces/IResponseError';
 import IToken from '../interfaces/IToken';
 import IUser from '../interfaces/IUser';
@@ -18,7 +18,7 @@ class UserService implements IUserService {
   ) {}
 
   requestBodyIsObject(): IResponseError | undefined {
-    const body = this.requestBody;
+    const body: IUser | IUserLogin = this.requestBody;
     if (typeof body !== 'object' || Array.isArray(body)) {
       return {
         error: { code: 400, message: 'The request body must be an object that is not an array!' },
@@ -34,8 +34,10 @@ class UserService implements IUserService {
     email,
     password,
   }: IUser): ValidationError | undefined {
-    const { object, string, boolean } = this.joiTypes;
-    const { error } = object.keys({
+    const { object, string, boolean }: {
+      object: ObjectSchema, string: StringSchema, boolean: BooleanSchema
+    } = this.joiTypes;
+    const { error }: { error: ValidationError | undefined } = object.keys({
       admin: boolean.not().empty().required(),
       firstName: string.not().empty().required(),
       lastName: string.not().empty().required(),
@@ -49,8 +51,8 @@ class UserService implements IUserService {
     email,
     password,
   }: IUserLogin): ValidationError | undefined {
-    const { object, string } = this.joiTypes;
-    const { error } = object.keys({
+    const { object, string }: { object: ObjectSchema, string: StringSchema } = this.joiTypes;
+    const { error }: { error: ValidationError | undefined } = object.keys({
       email: string.email().not().empty().required(),
       password: string.not().empty().required(),
     }).validate({ email, password });
@@ -59,7 +61,7 @@ class UserService implements IUserService {
   
   validateReturnJoi(): IResponseError | undefined {
     if (this.validation) {
-      const validationType = this.validation.details[0].type;
+      const validationType: string = this.validation.details[0].type;
       if (validationType === 'string.base' || validationType === 'string.email') {
         return { error: { code: 422, message: this.validation.message } };
       }
@@ -72,13 +74,13 @@ class UserService implements IUserService {
     user: IUser,
   ): Promise<IUserToken | IResponseError> {
     this.requestBody = user;
-    const bodyValidation = this.requestBodyIsObject();
+    const bodyValidation: IResponseError | undefined = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
     const joiValidation: ValidationError | undefined = this.validateAddNewUserFields(user);
     this.validation = joiValidation;
-    const validation = this.validateReturnJoi();
+    const validation: IResponseError | undefined = this.validateReturnJoi();
     if (validation) return validation;
-    const userExist = await this.model.getUserByEmail(user);
+    const userExist: IUserData[] = await this.model.getUserByEmail(user);
     if (userExist.length === 1) {
       return { error: { code: 409, message: 'User email already exists !' } };
     }
@@ -90,15 +92,15 @@ class UserService implements IUserService {
 
   async userLogin(body: IUserLogin): Promise<IToken | IResponseError> {
     this.requestBody = body;
-    const bodyValidation = this.requestBodyIsObject();
+    const bodyValidation: IResponseError | undefined = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
     const joiValidation: ValidationError | undefined = this.validateUserLoginFields(body);
     this.validation = joiValidation;
-    const validation = this.validateReturnJoi();
+    const validation: IResponseError | undefined = this.validateReturnJoi();
     if (validation) return validation;
-    const userExist = await this.model.getUserByEmailAndPassword(body);
+    const userExist: IUserData[] = await this.model.getUserByEmailAndPassword(body);
     if (userExist.length === 1) {    
-      userExist[0].admin = userExist[0].admin === 1;
+      userExist[0].admin = userExist[0].admin === 1 as number | boolean;
       const token: string = generateJwtToken('7d', userExist[0]);
       return { token } as IToken;
     }
