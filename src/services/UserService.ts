@@ -12,8 +12,8 @@ class UserService implements IUserService {
   constructor(
     private model: IUserModel,
     private joiTypes = Joi.types(),
-    private adminFormatted: boolean = false,
     private requestBody: IUser | IUserLogin = { email: '', password: '' },
+    private validation: ValidationError | undefined = undefined,
   ) {}
 
   requestBodyIsObject(): IResponseError | undefined {
@@ -55,13 +55,9 @@ class UserService implements IUserService {
     }).validate({ email, password });
     return error;
   }
-
-  async addNewUser(
-    user: IUser,
-  ): Promise<IUserData | IResponseError> {
-    const bodyValidation = this.requestBodyIsObject();
-    if (bodyValidation) return bodyValidation;
-    const validation: ValidationError | undefined = this.validateAddNewUserFields(user);
+  
+  validateReturnJoi(): IResponseError | undefined {
+    const validation: ValidationError | undefined = this.validation;
     if (validation) {
       const validationType = validation.details[0].type;
       if (validationType === 'string.base' || validationType === 'string.email') {
@@ -69,6 +65,18 @@ class UserService implements IUserService {
       }
       return { error: { code: 400, message: validation.message } };
     }
+    return validation;
+  }
+
+  async addNewUser(
+    user: IUser,
+  ): Promise<IUserData | IResponseError> {
+    const bodyValidation = this.requestBodyIsObject();
+    if (bodyValidation) return bodyValidation;
+    const joiValidation: ValidationError | undefined = this.validateAddNewUserFields(user);
+    this.validation = joiValidation;
+    const validation = this.validateReturnJoi();
+    if (validation) return validation;
     const userExist = await this.model.getUserByEmail(user);
     if (userExist.length === 1) {
       return { error: { code: 409, message: 'User email already exists !' } };
@@ -79,27 +87,17 @@ class UserService implements IUserService {
     return newUser;
   }
 
-  formatUserLoginAttribute({ admin }: IUserData): boolean {
-    if (admin === 1) {
-      this.adminFormatted = true;
-    }
-    return this.adminFormatted;
-  }
-
   async userLogin(body: IUserLogin): Promise<{ token: string } | IResponseError> {
     const bodyValidation = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
-    const validation: ValidationError | undefined = this.validateUserLoginFields(body);
-    if (validation) {
-      const validationType = validation.details[0].type;
-      if (validationType === 'string.base' || validationType === 'string.email') {
-        return { error: { code: 422, message: validation.message } };
-      }
-      return { error: { code: 400, message: validation.message } };
-    }
+    const joiValidation: ValidationError | undefined = this.validateUserLoginFields(body);
+    this.validation = joiValidation;
+    const validation = this.validateReturnJoi();
+    if (validation) return validation;
     const userExist = await this.model.getUserByEmailAndPassword(body);
-    if (userExist.length === 1) {
-      userExist[0].admin = this.formatUserLoginAttribute(userExist[0]);
+    if (userExist.length === 1) {    
+      userExist[0].admin = userExist[0].admin === 1;
+      console.log('userExist[0]:', userExist[0]);
       const token: string = generateJwtToken('7d', userExist[0]);
       return { token };
     }
