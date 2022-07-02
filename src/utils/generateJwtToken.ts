@@ -4,7 +4,7 @@ import IUserData from '../interfaces/IUserData';
 
 const generateJwtToken = (
   validity: string,
-  paylod: Omit<IUserData, 'password'>,
+  paylod: IUserData,
 ): string => {
   const jwtConfig: object = {
     expiresIn: validity,
