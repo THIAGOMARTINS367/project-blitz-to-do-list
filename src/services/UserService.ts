@@ -13,7 +13,18 @@ class UserService implements IUserService {
     private model: IUserModel,
     private joiTypes = Joi.types(),
     private adminFormatted: boolean = false,
+    private requestBody: IUser | IUserLogin = { email: '', password: '' },
   ) {}
+
+  requestBodyIsObject(): IResponseError | undefined {
+    const body = this.requestBody;
+    if (typeof body !== 'object' || Array.isArray(body)) {
+      return {
+        error: { code: 400, message: 'The request body must be an object that is not an array!' },
+      };
+    }
+    return undefined;
+  }
 
   private validateAddNewUserFields({
     admin,
@@ -48,6 +59,8 @@ class UserService implements IUserService {
   async addNewUser(
     user: IUser,
   ): Promise<IUserData | IResponseError> {
+    const bodyValidation = this.requestBodyIsObject();
+    if (bodyValidation) return bodyValidation;
     const validation: ValidationError | undefined = this.validateAddNewUserFields(user);
     if (validation) {
       const validationType = validation.details[0].type;
@@ -74,6 +87,8 @@ class UserService implements IUserService {
   }
 
   async userLogin(body: IUserLogin): Promise<{ token: string } | IResponseError> {
+    const bodyValidation = this.requestBodyIsObject();
+    if (bodyValidation) return bodyValidation;
     const validation: ValidationError | undefined = this.validateUserLoginFields(body);
     if (validation) {
       const validationType = validation.details[0].type;
