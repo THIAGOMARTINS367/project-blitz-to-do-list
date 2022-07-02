@@ -195,15 +195,13 @@ class TaskService implements ITaskService {
     if (validation) return validation;
     const userExist: IResponseError | IUserData = await this.validateUserExist(userData);
     if (Object.keys(userExist).includes('error')) return userExist as IResponseError;
-    const taskExists: IResponseError | ITask[] = await this.validateTaskExists(userData, body.tasks);
+    const taskExists:
+    IResponseError | ITask[] = await this.validateTaskExists(userData, body.tasks);
     if (Object.keys(taskExists).includes('error')) return taskExists as IResponseError;
     const queryInjection: string[] = [];
     body.tasks.forEach(() => queryInjection.push('?'));
-    const deletedTasks: number[] = await this.model.deleteTasks(
-      userData,
-      body.tasks,
-      queryInjection,
-    );
+    const deletedTasks: number[] = await this.model
+      .deleteTasks(userData, body.tasks, queryInjection);
     return deletedTasks;
   }
 }
