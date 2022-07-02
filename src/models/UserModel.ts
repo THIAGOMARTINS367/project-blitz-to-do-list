@@ -6,15 +6,9 @@ import IUserModel from '../interfaces/IUserModel';
 import connection from './connection';
 
 class UserModel implements IUserModel {
-  protected connectionDb: Pool = connection;
-
   constructor(
-    connectionDb?: Pool,
-  ) {
-    if (connectionDb) {
-      this.connectionDb = connectionDb;
-    }
-  }
+    private connectionDb: Pool = connection,
+  ) {}
 
   async addNewUser({
     admin,
@@ -47,7 +41,7 @@ class UserModel implements IUserModel {
       [email, password],
     );
     const userData = rows as IUserData[];
-    return userData as IUserData[];
+    return userData;
   }
 
   async getUserByEmail({
@@ -62,7 +56,7 @@ class UserModel implements IUserModel {
       [email],
     );
     const userData = rows as IUserData[];
-    return userData as IUserData[];
+    return userData;
   }
 }
 
