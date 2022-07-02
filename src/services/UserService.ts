@@ -57,15 +57,14 @@ class UserService implements IUserService {
   }
   
   validateReturnJoi(): IResponseError | undefined {
-    const validation: ValidationError | undefined = this.validation;
-    if (validation) {
-      const validationType = validation.details[0].type;
+    if (this.validation) {
+      const validationType = this.validation.details[0].type;
       if (validationType === 'string.base' || validationType === 'string.email') {
-        return { error: { code: 422, message: validation.message } };
+        return { error: { code: 422, message: this.validation.message } };
       }
-      return { error: { code: 400, message: validation.message } };
+      return { error: { code: 400, message: this.validation.message } };
     }
-    return validation;
+    return this.validation;
   }
 
   async addNewUser(
