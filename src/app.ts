@@ -1,4 +1,5 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
+import rescue from 'express-rescue';
 import UserController from './controllers/UserController';
 import UserModel from './models/UserModel';
 import UserService from './services/UserService';
@@ -14,28 +15,34 @@ app.use(express.json());
 
 const TO_DO_LIST_ROUTE = '/to-do-list';
 
-app.post('/sign-up', (req: Request, res: Response, next: NextFunction): void => {
-  new UserController(req, res, next).addNewUser(
-    new UserService(new UserModel()),
-  );
-});
+app.post(
+  '/sign-up',
+  rescue(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await new UserController(req, res, next).addNewUser(
+      new UserService(new UserModel()),
+    );
+  }),
+);
 
-app.post('/login', (req: Request, res: Response, next: NextFunction): void => {
-  new UserController(req, res, next).userLogin(
-    new UserService(new UserModel()),
-  );
-});
+app.post(
+  '/login',
+  rescue(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await new UserController(req, res, next).userLogin(
+      new UserService(new UserModel()),
+    );
+  }),
+);
 
 app.get(
   TO_DO_LIST_ROUTE,
   (req: Request, _res: Response, next: NextFunction): void => {
     new TokenAuthenticator(req, next).validateJwtToken();
   },
-  (req: Request, res: Response, next: NextFunction): void => {
-    new TaskController(req, res, next).getUserTaskList(
+  rescue(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await new TaskController(req, res, next).getUserTaskList(
       new TaskService(new TaskModel()),
     );
-  },
+  }),
 );
 
 app.post(
@@ -43,11 +50,11 @@ app.post(
   (req: Request, _res: Response, next: NextFunction): void => {
     new TokenAuthenticator(req, next).validateJwtToken();
   },
-  (req: Request, res: Response, next: NextFunction): void => {
-    new TaskController(req, res, next).addNewTask(
+  rescue(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await new TaskController(req, res, next).addNewTask(
       new TaskService(new TaskModel()),
     );
-  },
+  }),
 );
 
 app.put(
@@ -55,11 +62,11 @@ app.put(
   (req: Request, _res: Response, next: NextFunction): void => {
     new TokenAuthenticator(req, next).validateJwtToken();
   },
-  (req: Request, res: Response, next: NextFunction): void => {
-    new TaskController(req, res, next).updateTask(
+  rescue(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await new TaskController(req, res, next).updateTask(
       new TaskService(new TaskModel()),
     );
-  },
+  }),
 );
 
 app.delete(
@@ -67,11 +74,11 @@ app.delete(
   (req: Request, _res: Response, next: NextFunction): void => {
     new TokenAuthenticator(req, next).validateJwtToken();
   },
-  (req: Request, res: Response, next: NextFunction): void => {
-    new TaskController(req, res, next).deleteTasks(
+  rescue(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await new TaskController(req, res, next).deleteTasks(
       new TaskService(new TaskModel()),
     );
-  },
+  }),
 );
 
 app.use(errorMiddleware);
