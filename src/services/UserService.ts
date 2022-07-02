@@ -70,6 +70,7 @@ class UserService implements IUserService {
   async addNewUser(
     user: IUser,
   ): Promise<IUserData | IResponseError> {
+    this.requestBody = user;
     const bodyValidation = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
     const joiValidation: ValidationError | undefined = this.validateAddNewUserFields(user);
@@ -87,6 +88,7 @@ class UserService implements IUserService {
   }
 
   async userLogin(body: IUserLogin): Promise<{ token: string } | IResponseError> {
+    this.requestBody = body;
     const bodyValidation = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
     const joiValidation: ValidationError | undefined = this.validateUserLoginFields(body);
