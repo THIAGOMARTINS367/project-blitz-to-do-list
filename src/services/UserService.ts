@@ -1,5 +1,6 @@
 import Joi, { ValidationError } from 'joi';
 import IResponseError from '../interfaces/IResponseError';
+import IToken from '../interfaces/IToken';
 import IUser from '../interfaces/IUser';
 import IUserData from '../interfaces/IUserData';
 import IUserLogin from '../interfaces/IUserLogin';
@@ -69,7 +70,7 @@ class UserService implements IUserService {
 
   async addNewUser(
     user: IUser,
-  ): Promise<IUserData | IResponseError> {
+  ): Promise<IUserToken | IResponseError> {
     this.requestBody = user;
     const bodyValidation = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
@@ -81,13 +82,13 @@ class UserService implements IUserService {
     if (userExist.length === 1) {
       return { error: { code: 409, message: 'User email already exists !' } };
     }
-    const newUser = await this.model.addNewUser(user) as Omit<IUserToken, 'password'>;
+    const newUser = await this.model.addNewUser(user) as IUserData;
     const token: string = generateJwtToken('7d', newUser);
-    newUser.token = token;
-    return newUser;
+    const newUserWithToken: IUserToken = { ...newUser, token };
+    return newUserWithToken;
   }
 
-  async userLogin(body: IUserLogin): Promise<{ token: string } | IResponseError> {
+  async userLogin(body: IUserLogin): Promise<IToken | IResponseError> {
     this.requestBody = body;
     const bodyValidation = this.requestBodyIsObject();
     if (bodyValidation) return bodyValidation;
@@ -98,9 +99,8 @@ class UserService implements IUserService {
     const userExist = await this.model.getUserByEmailAndPassword(body);
     if (userExist.length === 1) {    
       userExist[0].admin = userExist[0].admin === 1;
-      console.log('userExist[0]:', userExist[0]);
       const token: string = generateJwtToken('7d', userExist[0]);
-      return { token };
+      return { token } as IToken;
     }
     return { error: { code: 422, message: 'Incorrect email or password !' } };
   }
