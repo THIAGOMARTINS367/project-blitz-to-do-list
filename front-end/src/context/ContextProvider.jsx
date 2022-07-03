@@ -4,10 +4,13 @@ import Context from './Context';
 
 function ContextProvider({ children }) {
   const [state, setState] = useState({ admin: false });
+  const [stateSignUpResponse, setStateSignUpResponse] = useState({});
 
   const context = {
     state,
     setState,
+    stateSignUpResponse,
+    setStateSignUpResponse,
   };
 
   return (
