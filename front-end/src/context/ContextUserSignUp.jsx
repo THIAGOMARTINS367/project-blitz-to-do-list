@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Context from './Context';
 
-function ContextProvider({ children }) {
+function ContextUserSignUp({ children }) {
   const [state, setState] = useState({ admin: false });
   const [stateSignUpResponse, setStateSignUpResponse] = useState({});
 
@@ -20,12 +20,12 @@ function ContextProvider({ children }) {
   );
 }
 
-ContextProvider.propTypes = {
+ContextUserSignUp.propTypes = {
   children: PropTypes.element,
 };
 
-ContextProvider.defaultProps = {
+ContextUserSignUp.defaultProps = {
   children: <>default</>,
 };
 
-export default ContextProvider;
+export default ContextUserSignUp;
