@@ -1,7 +1,7 @@
 import React from 'react';
 
 function UserLogin() {
-  return(
+  return (
     <section>
       <span>Essa é a página de Login do usuário</span>
     </section>
