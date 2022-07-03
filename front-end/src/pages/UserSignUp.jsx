@@ -83,7 +83,7 @@ function UserSignUp() {
       <button
         type="button"
         onClick={async () => {
-          setStateSignUpResponse(await sendUserData(state));
+          setStateSignUpResponse(await sendUserData(state, 'http://localhost:3001/sign-up'));
         }}
       >
         CADASTRAR
