@@ -1,4 +1,4 @@
-const fetchUserData = async (state) => {
+const sendUserData = async (state) => {
   const options = {
     method: 'POST',
     headers: {
@@ -13,4 +13,4 @@ const fetchUserData = async (state) => {
     .catch((error) => console.log('ERROR:', error));
 };
 
-export default fetchUserData;
+export default sendUserData;
