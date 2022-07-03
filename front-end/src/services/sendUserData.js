@@ -1,4 +1,4 @@
-const sendUserData = async (bodyData) => {
+const sendUserData = async (bodyData, url) => {
   const options = {
     method: 'POST',
     headers: {
@@ -7,7 +7,7 @@ const sendUserData = async (bodyData) => {
     },
     body: JSON.stringify(bodyData),
   };
-  const response = await fetch('http://localhost:3001/sign-up', options)
+  const response = await fetch(url, options)
     .catch((error) => console.log('ERROR:', error));
   const data = await response.json();
   return data;
