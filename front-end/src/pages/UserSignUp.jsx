@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import Context from '../context/Context';
 import sendUserData from '../services/sendUserData';
+import LabelAndInput from '../components/LabelAndInput';
+import LabelAndSelect from '../components/LabelAndSelect';
 
 function UserSignUp() {
   const {
@@ -11,71 +13,64 @@ function UserSignUp() {
   } = useContext(Context);
   return (
     <section>
-      <h1>Sign-Up</h1>
+      <h1>SIGN-UP</h1>
       <form>
-        <label htmlFor="input1">
-          NOME
-          <br />
-          <input
-            type="text"
-            id="input1"
-            onChange={({ target }) => setState({ ...state, firstName: target.value })}
-          />
-        </label>
+        <LabelAndInput
+          labelContent="Nome"
+          inputId="input1"
+          inputType="text"
+          onChangeEvent={({
+            target,
+          }) => setState({ ...state, firstName: target.value })}
+        />
+
+        <br />
+        <br />
+        <LabelAndInput
+          labelContent="Sobrenome"
+          inputId="input2"
+          inputType="text"
+          onChangeEvent={({
+            target,
+          }) => setState({ ...state, lastName: target.value })}
+        />
 
         <br />
         <br />
 
-        <label htmlFor="input2">
-          SOBRENOME
-          <br />
-          <input
-            type="text"
-            id="input2"
-            onChange={({ target }) => setState({ ...state, lastName: target.value })}
-          />
-        </label>
+        <LabelAndInput
+          labelContent="Email"
+          inputId="input3"
+          inputType="email"
+          onChangeEvent={({
+            target,
+          }) => setState({ ...state, email: target.value })}
+        />
 
         <br />
         <br />
 
-        <label htmlFor="input3">
-          EMAIL
-          <br />
-          <input
-            type="text"
-            id="input3"
-            onChange={({ target }) => setState({ ...state, email: target.value })}
-          />
-        </label>
+        <LabelAndInput
+          labelContent="Senha"
+          inputId="input4"
+          inputType="password"
+          onChangeEvent={({
+            target,
+          }) => setState({ ...state, password: target.value })}
+        />
 
         <br />
         <br />
 
-        <label htmlFor="input4">
-          SENHA
-          <br />
-          <input
-            type="password"
-            id="input4"
-            onChange={({ target }) => setState({ ...state, password: target.value })}
-          />
-        </label>
-
-        <br />
-        <br />
-
-        <label htmlFor="select-admin">
-          VOCÊ É UM ADMINISTRADOR?
-          <br />
-          <select
-            id="select-admin"
-            onChange={({ target }) => setState({ ...state, admin: target.value })}
-          >
-            <option value="false">NÃO</option>
-            <option value="true">SIM</option>
-          </select>
-        </label>
+        <LabelAndSelect
+          labelContent="Você é um administrador ?"
+          selectId="select-admin"
+          optionsContent={[
+            { optionContent: 'NÃO', optionValue: 'false' },
+            { optionContent: 'SIM', optionValue: 'true' },
+          ]}
+          onChangeEvent={({ target }) => setState({ ...state, admin: target.value === 'true' })}
+        />
 
         <br />
         <br />
