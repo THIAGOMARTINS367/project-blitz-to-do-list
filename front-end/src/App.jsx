@@ -4,18 +4,21 @@ import { Route, Switch } from 'react-router-dom';
 import UserSignUp from './pages/UserSignUp';
 import UserLogin from './pages/UserLogin';
 import ToDoList from './pages/ToDoList';
-import ContextProvider from './context/ContextProvider';
+import ContextUserSignUp from './context/ContextUserSignUp';
+import ContextUserLogin from './context/ContextUserLogin';
 
 function App() {
   return (
     <main>
-      <ContextProvider>
+      <ContextUserSignUp>
         <Switch>
           <Route path="/to-do-list/sign-up" component={UserSignUp} />
-          <Route path="/to-do-list/login" render={UserLogin} />
-          <Route path="/" render={ToDoList} />
+          <ContextUserLogin>
+            <Route path="/to-do-list/login" component={UserLogin} />
+          </ContextUserLogin>
+          <Route path="/" component={ToDoList} />
         </Switch>
-      </ContextProvider>
+      </ContextUserSignUp>
     </main>
   );
 }
