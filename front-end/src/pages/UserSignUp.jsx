@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import Context from '../context/Context';
-import fetchUserData from '../services/fetchUserData';
+import sendUserData from '../services/sendUserData';
 
 function UserSignUp() {
   const { state, setState } = useContext(Context);
@@ -56,7 +56,7 @@ function UserSignUp() {
         <br />
         <br />
 
-        <button type="button" onClick={() => fetchUserData(state)}>CADASTRAR</button>
+        <button type="button" onClick={() => sendUserData(state)}>CADASTRAR</button>
       </form>
     </section>
   );
