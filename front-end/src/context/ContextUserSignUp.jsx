@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Context from './Context';
 
-function ContextUserSignUp({ children }) {
+function ContextUserSignUp() {
   const [state, setState] = useState({ admin: false });
   const [stateSignUpResponse, setStateSignUpResponse] = useState({});
 
-  const context = {
+  return {
     state,
     setState,
     stateSignUpResponse,
     setStateSignUpResponse,
   };
-
-  return (
-    <Context.Provider value={context}>
-      {children}
-    </Context.Provider>
-  );
 }
 
 ContextUserSignUp.propTypes = {
