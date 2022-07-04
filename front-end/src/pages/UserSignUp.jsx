@@ -4,6 +4,7 @@ import Context from '../context/Context';
 import sendUserData from '../services/sendUserData';
 import LabelAndInput from '../components/LabelAndInput';
 import LabelAndSelect from '../components/LabelAndSelect';
+import { URL_POST_USER_SIGN_UP } from '../constants';
 
 function UserSignUp() {
   const {
@@ -91,7 +92,7 @@ function UserSignUp() {
       <button
         type="button"
         onClick={async () => {
-          const userData = await sendUserData(state, 'http://localhost:3001/sign-up');
+          const userData = await sendUserData(state, URL_POST_USER_SIGN_UP);
           setStateSignUpResponse(userData);
           if (userData.token) {
             setStateUserToken(userData.token);
