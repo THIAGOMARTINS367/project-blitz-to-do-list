@@ -6,6 +6,7 @@ import UserLogin from './pages/UserLogin';
 import ToDoList from './pages/ToDoList';
 import ContextUserSignUp from './context/ContextUserSignUp';
 import ContextUserLogin from './context/ContextUserLogin';
+import ContextToDoList from './context/ContextToDoList';
 
 function App() {
   return (
@@ -15,8 +16,10 @@ function App() {
           <Route path="/to-do-list/sign-up" component={UserSignUp} />
           <ContextUserLogin>
             <Route path="/to-do-list/login" component={UserLogin} />
+            <ContextToDoList>
+              <Route path="/" component={ToDoList} />
+            </ContextToDoList>
           </ContextUserLogin>
-          <Route path="/" component={ToDoList} />
         </Switch>
       </ContextUserSignUp>
     </main>
