@@ -8,7 +8,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "tsnode": "ts-node --files src/index.ts",
     "serverts": "tsnd --files src/index.ts",
-    "dev": "nodemon dist/src/"
+    "dev": "nodemon dist/src/",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
