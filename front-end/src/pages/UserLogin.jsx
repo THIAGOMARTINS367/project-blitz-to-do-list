@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { useHistory, Link } from 'react-router-dom';
 import Context from '../context/Context';
 import sendUserData from '../services/sendUserData';
 import LabelAndInput from '../components/LabelAndInput';
@@ -9,7 +10,9 @@ function UserLogin() {
     setStateLogin,
     stateLoginResponse,
     setStateLoginResponse,
+    setStateUserToken,
   } = useContext(Context);
+  const history = useHistory();
   return (
     <section>
       <h1>LOGIN</h1>
@@ -45,11 +48,22 @@ function UserLogin() {
       <button
         type="button"
         onClick={async () => {
-          setStateLoginResponse(await sendUserData(stateLogin, 'http://localhost:3001/login'));
+          const userData = await sendUserData(stateLogin, 'http://localhost:3001/login');
+          setStateLoginResponse(userData);
+          if (userData.token) {
+            setStateUserToken(userData.token);
+            localStorage.setItem('userToken', userData.token);
+            history.push('/to-do-list');
+          }
         }}
       >
         Login
       </button>
+      <br />
+      <br />
+      <div>
+        <Link to="/to-do-list/sign-up">Criar Conta</Link>
+      </div>
     </section>
   );
 }
