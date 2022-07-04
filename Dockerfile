@@ -6,8 +6,8 @@ COPY package.json .
 
 RUN npm install
 
-RUN npm run tsc
-
 COPY . .
+
+RUN npm run tsc
 
 CMD ["node", "dist", "src", "index.js"]
