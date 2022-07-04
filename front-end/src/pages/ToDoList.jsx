@@ -1,12 +1,25 @@
 import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
 import Context from '../context/Context';
 
 function ToDoList() {
   const {
     stateToDoList,
+    setStateUserToken,
   } = useContext(Context);
   return (
     <section>
+      <header>
+        <Link
+          to="/to-do-list/login"
+          onClick={() => {
+            localStorage.setItem('userToken', '');
+            setStateUserToken(undefined);
+          }}
+        >
+          <button type="button">Logout</button>
+        </Link>
+      </header>
       <h1>LISTA DE TAREFAS</h1>
       <table>
         <thead>
@@ -19,7 +32,7 @@ function ToDoList() {
         <tbody>
           {
             stateToDoList.map(({ taskContent, status, updatedAt }) => (
-              <tr>
+              <tr key={`${status}-${updatedAt}`}>
                 <td>{taskContent}</td>
                 <td>{status}</td>
                 <td>{updatedAt}</td>
