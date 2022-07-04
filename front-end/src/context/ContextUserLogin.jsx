@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Context from './Context';
 
-function ContextUserLogin({ children }) {
+function ContextUserLogin() {
   const [stateLogin, setStateLogin] = useState({});
   const [stateLoginResponse, setStateLoginResponse] = useState({});
 
-  const context = {
+  return {
     stateLogin,
     setStateLogin,
     stateLoginResponse,
     setStateLoginResponse,
   };
-
-  return (
-    <Context.Provider value={context}>
-      {children}
-    </Context.Provider>
-  );
 }
 
 ContextUserLogin.propTypes = {
