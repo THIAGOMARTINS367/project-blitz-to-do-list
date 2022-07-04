@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import fetchToDoList from '../services/fetchToDoList';
+import { URL_GET_TASK_LIST } from '../constants';
 
 function ContextToDoList() {
   const [stateToDoList, setToDoList] = useState([]);
@@ -13,7 +14,7 @@ function ContextToDoList() {
     const { location: { pathname } } = history;
     const token = stateUserToken || localStorage.getItem('userToken');
     if (pathname === '/to-do-list' && token && token.length > 0) {
-      fetchToDoList('http://localhost:3001/to-do-list', token)
+      fetchToDoList(URL_GET_TASK_LIST, token)
         .then((data) => {
           if (Array.isArray(data)) {
             setToDoList(data);
