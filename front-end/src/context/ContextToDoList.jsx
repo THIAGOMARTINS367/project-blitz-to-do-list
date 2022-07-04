@@ -15,7 +15,6 @@ function ContextToDoList() {
     if (pathname === '/to-do-list' && token && token.length > 0) {
       fetchToDoList('http://localhost:3001/to-do-list', token)
         .then((data) => {
-          console.log('data:', data);
           if (Array.isArray(data)) {
             setToDoList(data);
           } else {
