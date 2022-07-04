@@ -85,7 +85,7 @@ class UserService implements IUserService {
       return { error: { code: 409, message: 'User email already exists !' } };
     }
     const newUser = await this.model.addNewUser(user) as IUserData;
-    const token: string = generateJwtToken('7d', newUser);
+    const token: string = generateJwtToken(newUser);
     const newUserWithToken: IUserToken = { ...newUser, token };
     return newUserWithToken;
   }
@@ -101,7 +101,7 @@ class UserService implements IUserService {
     const userExist: IUserData[] = await this.model.getUserByEmailAndPassword(body);
     if (userExist.length === 1) {    
       userExist[0].admin = userExist[0].admin === 1 as number | boolean;
-      const token: string = generateJwtToken('7d', userExist[0]);
+      const token: string = generateJwtToken(userExist[0]);
       return { token } as IToken;
     }
     return { error: { code: 422, message: 'Incorrect email or password !' } };
