@@ -13,7 +13,7 @@ function App() {
         <Switch>
           <Route path="/to-do-list/sign-up" component={UserSignUp} />
           <Route path="/to-do-list/login" component={UserLogin} />
-          <Route path="/" component={ToDoList} />
+          <Route exact path="/to-do-list" component={ToDoList} />
         </Switch>
       </ContextProvider>
     </main>
