@@ -3,6 +3,7 @@ import { useHistory, Link } from 'react-router-dom';
 import Context from '../context/Context';
 import sendUserData from '../services/sendUserData';
 import LabelAndInput from '../components/LabelAndInput';
+import { URL_POST_USER_LOGIN } from '../constants';
 
 function UserLogin() {
   const {
@@ -48,7 +49,7 @@ function UserLogin() {
       <button
         type="button"
         onClick={async () => {
-          const userData = await sendUserData(stateLogin, 'http://localhost:3001/login');
+          const userData = await sendUserData(stateLogin, URL_POST_USER_LOGIN);
           setStateLoginResponse(userData);
           if (userData.token) {
             setStateUserToken(userData.token);
