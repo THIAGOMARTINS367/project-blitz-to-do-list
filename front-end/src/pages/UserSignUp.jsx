@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { useHistory, Link } from 'react-router-dom';
 import Context from '../context/Context';
 import sendUserData from '../services/sendUserData';
 import LabelAndInput from '../components/LabelAndInput';
@@ -10,10 +11,17 @@ function UserSignUp() {
     setState,
     stateSignUpResponse,
     setStateSignUpResponse,
+    setStateUserToken,
   } = useContext(Context);
+  const history = useHistory();
   return (
     <section>
       <h1>SIGN-UP</h1>
+      <Link to="/to-do-list/login">
+        Voltar para Login
+      </Link>
+      <br />
+      <br />
       <form>
         <LabelAndInput
           labelContent="Nome"
@@ -83,7 +91,13 @@ function UserSignUp() {
       <button
         type="button"
         onClick={async () => {
-          setStateSignUpResponse(await sendUserData(state, 'http://localhost:3001/sign-up'));
+          const userData = await sendUserData(state, 'http://localhost:3001/sign-up');
+          setStateSignUpResponse(userData);
+          if (userData.token) {
+            setStateUserToken(userData.token);
+            localStorage.setItem('userToken', userData.token);
+            history.push('/to-do-list');
+          }
         }}
       >
         CADASTRAR
