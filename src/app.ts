@@ -8,8 +8,11 @@ import TaskController from './controllers/TaskController';
 import TaskModel from './models/TaskModel';
 import TaskService from './services/TaskService';
 import TokenAuthenticator from './middlewares/TokenAuthenticator';
+import cors from 'cors';
 
 const app: Express = express();
+
+app.use(cors());
 
 app.use(express.json());
 
