@@ -8,6 +8,7 @@ import connection from './connection';
 class UserModel implements IUserModel {
   constructor(
     private connectionDb: Pool = connection,
+    private dbName: string = process.env.MYSQL_DB_NAME || 'default_db',
   ) {}
 
   async addNewUser({
@@ -19,7 +20,7 @@ class UserModel implements IUserModel {
   }: IUser): Promise<IUserData> {
     try {
       const [rows] = await this.connectionDb.execute(
-        `INSERT INTO blitz_toDoList.user
+        `INSERT INTO ${this.dbName}.user
           (admin, first_name, last_name, email, password)
         VALUES (?,?,?,?,?)`,
         [admin, firstName, lastName, email, password],
@@ -40,7 +41,7 @@ class UserModel implements IUserModel {
         `SELECT
           user_id AS userId, admin, first_name AS firstName, last_name AS lastName, email
         FROM
-          blitz_toDoList.user
+          ${this.dbName}.user
         WHERE email = ? AND password = ?`,
         [email, password],
       );
@@ -59,7 +60,7 @@ class UserModel implements IUserModel {
         `SELECT
           user_id AS userId, admin, first_name AS firstName, last_name AS lastName, email
         FROM
-          blitz_toDoList.user
+          ${this.dbName}.user
         WHERE email = ?`,
         [email],
       );
