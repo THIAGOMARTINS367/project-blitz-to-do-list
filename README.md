@@ -1,9 +1,9 @@
 # Descrição
 
-Nessa parte do projeto foi desenvolvido a aplicação React "front-end"
-da aplicação "To-Do-List" (Lista de Tarefas), onde a parte de interação do usuário acontece.
+Nessa parte do projeto foi desenvolvida a API (back-end) da aplicação "To-Do-List" (Lista de Tarefas),
+onde todas as requisições ao banco de dados e processamento de dados, que vem do front-end acontecem de fato.
+Tal API foi desenvolvida utilizando boas práticas de desenvolvimento baseando-se na arquitetura REST e nos princípios do SOLID.
 
-Nela o usuário pode se cadastrar, fazer login, e assim, acessar sua lista de tarefas.
 
 ### *ATENÇÃO: Para utilizar a aplicação acesse o link no canto direito em "About"*.
 
@@ -17,41 +17,39 @@ Nela o usuário pode se cadastrar, fazer login, e assim, acessar sua lista de ta
 - [Tecnologias usadas](#tecnologias-usadas)
 - [ANTES DE INICIALIZAR A APLICAÇÃO](#antes-de-inicializar-a-aplicação)
 - [Linter](#linter)
-- [Rotas Implementadas](#rotas-implementadas)
+- [Endpoints implementados](#endpoints-implementados)
+
 
 ---
 
 ## Dependências
 
-- React
+- NodeJS
 - Vs Code
 - Bibliotecas
-  - @testing-library/jest-dom
-  - @testing-library/react
-  - @testing-library/user-event
-  - prop-types
-  - react
-  - react-dom
-  - react-router-dom
-  - react-scripts
-  - web-vitals
-
+  - cors
+  - dotenv
+  - express,
+  - express-rescue
+  - joi
+  - jsonwebtoken
+  - mysql2
+ 
 ---
 
 ## O que foi desenvolvido
 
-Foi implementado uma o front-end da aplicação "To-Do-List" (Lista de Tarefas) responsável
-por receber as ações dos usuários da aplicação e enviar, de forma correta e esperada, dados para API
-da aplicação, bem como receber os dados retornados da API e renderizá-los na página correta do site
-para que os usuŕios tenham acesso, desde que estejam devidamente logados no sistema.
+Foi implementado uma API REST que recebe e retorna dados de uma lista de tarefas
+e dos usuários cadastrados no Banco de Dados.
+Sendo possível fazer todas as ações de um CRUD na lista de tarefas, bem como cadastrar e logar como um usuário.
 
-Tais dados podem ser: Dados do Usuário (Cadastro e Login) e dados das tarefas (Conteúdo da Tarefa, status e etc...).
+Além de fazer o controle de acesso dos usuários à lista de tarefas fazendo com que apenas os usuários que cadastrarem uma tarefa tenham acesso a ela.
 
 ---
 
 ## Tecnologias usadas
 
-- `javascript` , `jsx` , `React` , `ContextAPI` e `css`.
+- `TypeScript` , `Express` e `Docker`
 
 ---
 
@@ -61,33 +59,37 @@ Tais dados podem ser: Dados do Usuário (Cadastro e Login) e dados das tarefas (
   * `git clone git@github.com:THIAGOMARTINS367/project-blitz-to-do-list.git`
   * Entre na pasta do repositório que você acabou de clonar:
     * `cd project-blitz-to-do-list`
-  * Acesse a branch do front-end:
-    * `git checkout dev-thiago-martins-front-end`
-  * Acesse a pasta do front-end:
-    * `cd front-end
+  * Acesse a branch da API:
+    * `git checkout dev-thiago-martins-back-end`
+  * Acesse a pasta da API:
+    * `cd back-end`
 
 2. Instale as dependências e inicialize o projeto
   * Instale as dependências:
     * `npm install`
+    
+  * Transpile o código TypeScript:
+    * `npm run tsc`
+    
   * Inicialize o projeto:
-    * `npm start` (uma nova página deve abrir no seu navegador)
-  * Acesse a Rota da lista de tarefas no seu navegador
-    * `https://localhost:3000/to-do-list`
+    * `npm start`
 
 ---
 
 ## Linter
 
-Para garantir a qualidade do código de forma a tê-lo mais legível, de mais fácil manutenção e seguindo as boas práticas de desenvolvimento foi utilizado neste projeto o linter `ESLint` e o `Stylelint`. Para rodar o linter localmente, execute o comando abaixo:
+Para garantir a qualidade do código de forma a tê-lo mais legível, de mais fácil manutenção e seguindo as boas práticas de desenvolvimento foi utilizado neste projeto o linter `ESLint`. Para rodar o linter localmente, execute o comando abaixo:
 
 ```bash
 npm run lint
-npm run lint:styles
 ```
 ---
 
-## Rotas Implementadas
+## Endpoints implementados
 
-- Cadastro de Usuário: `/to-do-list/sign-up`
-- Login do Usuário: `/to-do-list/login`
-- Lista de Tarefas: `/to-do-list`
+- Cadastro do Usuário: `POST /sign-up`
+- Login do Usuário: `POST /login`
+- Obter Lista de Tarefas: `GET /to-do-list`
+- Cadastrar Tarefas: `POST /to-do-list`
+- Editar Tarefa: `PUT /to-do-list/:taskId`
+- Deletar Tarefas: `DELETE /to-do-list`
