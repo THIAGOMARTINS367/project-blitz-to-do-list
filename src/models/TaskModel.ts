@@ -7,6 +7,7 @@ import connection from './connection';
 class TaskModel implements ITaskModel {
   constructor(
     private connectionDb: Pool = connection,
+    private dbName: string = process.env.MYSQL_DB_NAME || 'default_db',
   ) {}
 
   async getUserTaskList({
@@ -20,7 +21,7 @@ class TaskModel implements ITaskModel {
           status,
           created_at AS createdAt,
           updated_at AS updatedAt
-        FROM blitz_toDoList.task WHERE user_id = ?`,
+        FROM ${this.dbName}.task WHERE user_id = ?`,
         [userId],
       );
       const taskList = rows as Omit<ITask[], 'userId'>;
@@ -37,7 +38,7 @@ class TaskModel implements ITaskModel {
     try {
       await this.connectionDb.execute(
         `INSERT INTO
-          blitz_toDoList.task (task_content, status, user_id)
+          ${this.dbName}.task (task_content, status, user_id)
         VALUES
           ${queryInjection.join(',')}`,
         [...tasksData],
@@ -57,7 +58,7 @@ class TaskModel implements ITaskModel {
       const updatedAt: Date = new Date();
       await this.connectionDb.execute(
         `UPDATE
-          blitz_toDoList.task
+          ${this.dbName}.task
         SET task_content = ?, status = ?, updated_at = ?
         WHERE task_id = ? AND user_id = ?`,
         [taskContent, status, updatedAt, taskId, userId],
@@ -78,7 +79,7 @@ class TaskModel implements ITaskModel {
         `SELECT task_id AS taskId, task_content AS taskContent, status,
           created_at AS createdAt,
           updated_at AS updatedAt
-        FROM blitz_toDoList.task
+        FROM ${this.dbName}.task
         WHERE user_id = ? AND task_id IN(${mysqlInjection.join(',')})`,
         [userId, ...taskIds],
       );
@@ -98,7 +99,7 @@ class TaskModel implements ITaskModel {
           first_name AS firstName,
           last_name AS lastName,
           email
-        FROM blitz_toDoList.user WHERE user_id = ?`,
+        FROM ${this.dbName}.user WHERE user_id = ?`,
         [userId],
       );
       const userData = rows as IUserData[];
@@ -116,7 +117,7 @@ class TaskModel implements ITaskModel {
     try {
       await this.connectionDb.execute(
         `DELETE FROM
-          blitz_toDoList.task
+          ${this.dbName}.task
         WHERE user_id = ? AND task_id IN(${queryInjection.join(',')})`,
         [userId, ...body],
       );
