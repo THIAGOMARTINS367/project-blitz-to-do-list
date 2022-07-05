@@ -6,7 +6,7 @@ COPY package.json .
 
 RUN npm install
 
-COPY . .
+COPY ./back-end .
 
 RUN npm run tsc
 
