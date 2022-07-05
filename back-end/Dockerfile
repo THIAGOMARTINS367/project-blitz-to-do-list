@@ -10,6 +10,4 @@ COPY . .
 
 RUN npm run tsc
 
-RUN npm start
-
-# CMD ["node", "dist", "src", "index.js"]
+CMD ["node", "dist", "src", "index.js"]
