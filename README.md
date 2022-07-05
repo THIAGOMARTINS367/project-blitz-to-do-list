@@ -4,6 +4,7 @@ Nessa parte do projeto foi desenvolvida a API (back-end) da aplicação "To-Do-L
 onde todas as requisições ao banco de dados e processamento de dados, que vem do front-end acontecem de fato.
 Tal API foi desenvolvida utilizando boas práticas de desenvolvimento baseando-se na arquitetura REST e nos princípios do SOLID.
 
+
 ### *ATENÇÃO: Para utilizar a aplicação acesse o link no canto direito em "About"*.
 
 ---
@@ -17,6 +18,7 @@ Tal API foi desenvolvida utilizando boas práticas de desenvolvimento baseando-s
 - [ANTES DE INICIALIZAR A APLICAÇÃO](#antes-de-inicializar-a-aplicação)
 - [Linter](#linter)
 - [Endpoints implementados](#endpoints-implementados)
+
 
 ---
 
@@ -32,8 +34,7 @@ Tal API foi desenvolvida utilizando boas práticas de desenvolvimento baseando-s
   - joi
   - jsonwebtoken
   - mysql2
-
-
+ 
 ---
 
 ## O que foi desenvolvido
@@ -61,7 +62,7 @@ Além de fazer o controle de acesso dos usuários à lista de tarefas fazendo co
   * Acesse a branch da API:
     * `git checkout dev-thiago-martins-back-end`
   * Acesse a pasta da API:
-    * `cd back-end` 
+    * `cd back-end`
 
 2. Instale as dependências e inicialize o projeto
   * Instale as dependências:
