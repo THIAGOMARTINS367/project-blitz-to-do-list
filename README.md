@@ -58,7 +58,7 @@ Tais dados podem ser: Dados do Usuário (Cadastro e Login) e dados das tarefas (
 ## ANTES DE INICIALIZAR A APLICAÇÃO
 
 1. Clone o repositório
-  * `git clone `
+  * `git clone git@github.com:THIAGOMARTINS367/project-blitz-to-do-list.git`
   * Entre na pasta do repositório que você acabou de clonar:
     * `cd project-blitz-to-do-list`
   * Acesse a branch do front-end:
